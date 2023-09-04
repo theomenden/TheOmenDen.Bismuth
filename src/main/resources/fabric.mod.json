@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "bismuth",
+  "version": "${version}",
+  "name": "Bismuth",
+  "description": "A custom colors mod for Fabric",
+  "authors": [
+    "Andy Beers (Alu)"
+  ],
+  "contact": {
+    "repo": "https://github.com/andre/TheOmenDen.Bismuth"
+  },
+  "license": "LGPL-3.0",
+  "icon": "assets/bismuthElement.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.theomenden.bismuth.client.Bismuth"
+    ]
+  },
+  "mixins": [
+    "bismuth.mixins.json"
+  ],
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/GWshtCqEx4"
+      },
+      "update_checker": true
+    },
+    "sodium:options": {
+      "quality.biome_blend":false
+    }
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}",
+    "sodium": ">=0.4.10",
+    "indium":">=1.0.19",
+    "cloth-config": ">=10.1.105",
+    "java": ">=17"
+  },
+  "breaks": {
+    "optifabric": "*"
+  }
+}

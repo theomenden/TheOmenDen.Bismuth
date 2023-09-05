@@ -7,7 +7,9 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import com.theomenden.bismuth.client.Bismuth;
 import com.theomenden.bismuth.models.ApplicableBlockStates;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,11 +56,11 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
                     initializeSpecialBlockStates(applicableBlockStates, id, parts);
                     return applicableBlockStates;
                 } else {
-                    block = Registries.BLOCK.get(id);
+                    block = BuiltInRegistries.BLOCK.get(id);
                 }
                 beginningIndex = 2;
             } else {
-                block =  Registries.BLOCK.cast(new ResourceLocation(parts[0]));
+                block =  BuiltInRegistries.BLOCK.get(new ResourceLocation(parts[0]));
                 beginningIndex = 1;
             }
         } catch (Exception e) {
@@ -94,7 +96,7 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
                     .stream(propertyValues)
                     .forEach(s -> putPropertyValue(container, propertyState, s));
 
-            predicate = predicate.with(propertyState, container::contains);
+            predicate = predicate.where(propertyState, container::contains);
         }
 
         applicableBlockStates.states = new ArrayList<>();

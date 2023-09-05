@@ -1,8 +1,7 @@
 package com.theomenden.bismuth.utils;
 
 import com.theomenden.bismuth.client.Bismuth;
-import com.theomenden.bismuth.colors.resources.BiomeColorMappingResource;
-import com.theomenden.bismuth.colors.resources.LinearColorMappingResource;
+import com.theomenden.bismuth.colors.resources.*;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.resources.ResourceLocation;
 

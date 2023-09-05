@@ -2,12 +2,13 @@ package com.theomenden.bismuth.models;
 
 import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
-import com.mojang.brigadier.StringReader;
 import com.theomenden.bismuth.client.Bismuth;
+import com.theomenden.bismuth.defaults.DefaultColumns;
 import com.theomenden.bismuth.models.enums.ColumnLayout;
 import com.theomenden.bismuth.models.enums.Format;
 import com.theomenden.bismuth.models.records.BismuthColor;
 import com.theomenden.bismuth.models.records.ColumnBounds;
+import com.theomenden.bismuth.utils.BiomeTracingUtils;
 import com.theomenden.bismuth.utils.BismuthColormaticResolution;
 import com.theomenden.bismuth.utils.GsonUtils;
 import lombok.Getter;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.Reader;
 import java.util.*;
 import java.util.stream.Collectors;

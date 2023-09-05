@@ -8,7 +8,7 @@ import com.theomenden.bismuth.mixin.biome.BiomeAccessor;
 import com.theomenden.bismuth.models.ColorMappingProperties;
 import com.theomenden.bismuth.models.records.BismuthColor;
 import com.theomenden.bismuth.models.records.ColumnBounds;
-import com.theomenden.bismuth.models.records.Coordinates
+import com.theomenden.bismuth.models.records.Coordinates;
 import com.theomenden.bismuth.utils.ColorConverter;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
@@ -23,8 +23,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
-
-import static com.theomenden.bismuth.models.enums.Format.*;
 
 public class BiomeColorMapping implements BismuthResolver {
     private static final Logger LOGGER = LogManager.getLogger(Bismuth.MODID);
@@ -54,13 +52,13 @@ public class BiomeColorMapping implements BismuthResolver {
     public int getColorAtCoordinatesForBiome(RegistryAccess manager, Biome biome, Coordinates coordinates) {
         switch (properties.getFormat()) {
             case VANILLA -> {
-                float temp = ((BiomeAccessor)biome).getTemperature();
+                float temp = biome.climateSettings.temperature();
                 temp = Range
                         .between(0.0f, 1.0f)
                         .fit(temp);
                 float rain = Range
                         .between(0.0f, 1.0f)
-                        .fit(biome.weather.downfall());
+                        .fit(biome.climateSettings.downfall());
                 return getColorMap(temp, rain);
             }
             case GRID -> {

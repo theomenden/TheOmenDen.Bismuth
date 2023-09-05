@@ -32,6 +32,7 @@
       "quality.biome_blend":false
     }
   },
+  "accessWidener": "bismuth.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",

@@ -53,7 +53,7 @@ public class ColorMappingStorage<T> {
     }
 
     @Nullable
-    public BismuthResolver getVanadiumResolver(T key) {
+    public BismuthResolver getBismuthResolver(T key) {
         var extendedResolver = getExtendedResolver(key);
 
         return extendedResolver != null
@@ -65,7 +65,7 @@ public class ColorMappingStorage<T> {
         return !colorMappings.row(key).isEmpty() || fallbackColorMappings.containsKey(key);
     }
 
-    public void addColorMapping(BiomeColorMapping colorMapping, Collection<? extends T> keys, Set<? extends Identifier> biomes) {
+    public void addColorMapping(BiomeColorMapping colorMapping, Collection<? extends T> keys, Set<? extends ResourceLocation> biomes) {
         if(biomes.isEmpty()){
             keys
                     .forEach(key -> {

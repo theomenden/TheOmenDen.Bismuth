@@ -13,6 +13,8 @@ import com.theomenden.bismuth.utils.BismuthColormaticResolution;
 import com.theomenden.bismuth.utils.GsonUtils;
 import lombok.Getter;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -100,30 +102,8 @@ public class ColorMappingProperties {
         }
     }
 
-    public ColumnBounds getColumn(ResourceKey<Biome> biomeRegistryKey) {
-        if (format == Format.GRID
-                && biomeRegistryKey != null) {
-            ResourceLocation id = biomeRegistryKey.location();
-            if (columnsByBiome != null) {
-                ColumnBounds cb = columnsByBiome.get(id);
 
-                if (cb == null) {
-                    throw new IllegalArgumentException(id.toString());
-                }
-            } else {
-                return switch (layout) {
-                    case DEFAULT -> DefaultColumns.getDefaultBoundaries(biomeRegistryKey);
-                    case OPTIFINE -> DefaultColumns.getOptifineBoundaries(biomeRegistryKey);
-                    case LEGACY -> DefaultColumns.getLegacyBoundaries(biomeRegistryKey, this.isUsingOptfine);
-                    case STABLE -> DefaultColumns.getStableBoundaries(biomeRegistryKey);
-                };
-            }
-        }
-        throw new IllegalStateException(format.toString());
-    }
-
-
-    public ColumnBounds getColumn(ResourceKey<Biome> biomeKey, Registry<Biome> biomeRegistry) {
+    public ColumnBounds getColumn(ResourceKey<Biome> biomeKey, ResourceKey<Registry<Biome>> biomeRegistry) {
         if(format == Format.GRID) {
             if(biomeKey != null) {
                 ResourceLocation id = biomeKey.location();

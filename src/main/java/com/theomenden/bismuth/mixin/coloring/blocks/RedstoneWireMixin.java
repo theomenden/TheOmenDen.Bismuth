@@ -45,7 +45,7 @@ public abstract class RedstoneWireMixin extends Block {
             double y = ((float)pos.getY() + 0.0625F);
             double z = pos.getZ() + 0.5 + (random.nextFloat() - 0.5) * 0.2;
 
-            int color = redstoneColor.getColorAtindex(i);
+            int color = redstoneColor.getColorAtIndex(i);
 
             var colorValues = ColorConverter.createColorVector(color);
 

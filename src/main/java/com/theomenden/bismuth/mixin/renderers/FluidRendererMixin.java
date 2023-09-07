@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.*;
 @Mixin(LiquidBlockRenderer.class)
 public abstract class FluidRendererMixin {
  @ModifyVariable(
-         method = "tesselate",
-         at = @At(value="STORE"),
+         method = "tesselate(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/material/FluidState;)V",
+         at = @At("STORE"),
          ordinal = 0
  )
     private int calculateFluidColor(int original, BlockAndTintGetter level, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState) {
@@ -24,4 +24,5 @@ public abstract class FluidRendererMixin {
     }
      return original;
  }
+
 }

@@ -189,7 +189,7 @@ public class GlobalColorProperties {
         return colors != null? colors[index] : 0;
     }
 
-    public TextColor getText(Format formatting) {
+    public TextColor getText(ChatFormatting formatting) {
         return textColor.get(formatting);
     }
 

@@ -16,10 +16,15 @@
   "entrypoints": {
     "client": [
       "com.theomenden.bismuth.client.Bismuth"
+    ],
+    "modmenu": [
+      "com.theomenden.bismuth.client.BismuthModMenu"
     ]
   },
   "mixins": [
-    "bismuth.mixins.json"
+    "bismuth.mixins.json",
+    "bismuth.sodium.mixins.json",
+    "bismuth.fabric.mixins.json"
   ],
   "custom": {
     "modmenu": {
@@ -29,7 +34,8 @@
       "update_checker": true
     },
     "sodium:options": {
-      "quality.biome_blend":false
+      "mixin.features.fast_biome_colors": false,
+      "mixin.options.biomeBlendRadius": false
     }
   },
   "accessWidener": "bismuth.accesswidener",

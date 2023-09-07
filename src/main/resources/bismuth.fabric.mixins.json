@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.theomenden.bismuth.mixin.fabricapi",
+  "compatibilityLevel": "JAVA_17",
+  "plugin": "com.theomenden.bismuth.mixin.fabricapi.FabricApiFilterPlugin",
+  "client": [
+    "FluidRendererHandlerRegistryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

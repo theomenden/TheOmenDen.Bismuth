@@ -28,7 +28,8 @@ import java.util.Properties;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class GsonUtils {
+public final class GsonUtils {
+    private GsonUtils(){}
     private static final Logger logger = LogManager.getLogger(Bismuth.MODID);
     public static final Gson PROPERTY_GSON = new GsonBuilder()
             .registerTypeAdapterFactory(new StringIdentifiableTypeAdapterFactory())

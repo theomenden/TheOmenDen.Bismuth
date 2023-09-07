@@ -4,16 +4,19 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.theomenden.bismuth.client.Bismuth;
 import com.theomenden.bismuth.colors.BismuthExtendedColorResolver;
 import com.theomenden.bismuth.colors.interfaces.BismuthResolver;
-import com.theomenden.bismuth.mixin.biome.BiomeAccessor;
 import com.theomenden.bismuth.models.ColorMappingProperties;
 import com.theomenden.bismuth.models.records.BismuthColor;
 import com.theomenden.bismuth.models.records.ColumnBounds;
 import com.theomenden.bismuth.models.records.Coordinates;
 import com.theomenden.bismuth.utils.ColorConverter;
+import com.theomenden.bismuth.utils.SimpleBiomeRegistryUtils;
 import lombok.Getter;
+import net.fabricmc.fabric.impl.biome.modification.BuiltInRegistryKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -63,8 +66,7 @@ public class BiomeColorMapping implements BismuthResolver {
             }
             case GRID -> {
                 ColumnBounds columnBounds = properties.getColumn(
-                        Bismuth.getBiomeResourceKey(manager, biome),
-                        manager.registryOrThrow(Registries.BIOME));
+                        Bismuth.getBiomeResourceKey(manager, biome), Registries.BIOME);
                 @SuppressWarnings({"removal", "deprecation"})
                 double fraction = Biome.BIOME_INFO_NOISE
                         .getValue(coordinates.x() * 0.0225, coordinates.z() * 0.0225, false);
@@ -119,7 +121,7 @@ public class BiomeColorMapping implements BismuthResolver {
             }
             case GRID -> {
                 try {
-                    int x =  properties.getColumn(Biomes.PLAINS)
+                    int x =  properties.getColumn(Biomes.PLAINS, Registries.BIOME)
                                        .Column();
                     int y = Range
                             .between(0, imageColorMapping.getHeight() - 1)

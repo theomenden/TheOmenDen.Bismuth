@@ -1,6 +1,7 @@
 package com.theomenden.bismuth.colors.decorators;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.theomenden.bismuth.colors.mapping.BiomeColorMappings;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -25,7 +26,12 @@ public class BismuthFluidRenderHandler implements FluidRenderHandler {
 
     @Override
     public int getFluidColor(@Nullable BlockAndTintGetter view, @Nullable BlockPos pos, FluidState state) {
-        return this.delegate.getFluidColor(view, pos, state);
+       var blockState = state.createLegacyBlock();
+
+       if(BiomeColorMappings.isCustomColored(blockState)) {
+           return BiomeColorMappings.getBiomeColorMapping(blockState, view, pos);
+       }
+       return this.delegate.getFluidColor(view, pos ,state);
     }
 
     @Override

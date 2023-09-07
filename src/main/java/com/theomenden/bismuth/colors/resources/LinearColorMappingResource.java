@@ -9,7 +9,7 @@ public class LinearColorMappingResource extends ColorMappingResource {
         super(location);
     }
 
-    public int getColorAtindex(int index) {
+    public int getColorAtIndex(int index) {
         if(index >=this.colorMapping.length) {
             index = this.colorMapping.length - 1;
         }

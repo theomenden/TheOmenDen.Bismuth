@@ -1,33 +1,67 @@
 package com.theomenden.bismuth.mixin.client;
 
+import com.theomenden.bismuth.blending.BlendingChunk;
+import com.theomenden.bismuth.caching.caches.BlendingCache;
+import com.theomenden.bismuth.caching.caches.ColorCache;
+import com.theomenden.bismuth.caching.caches.LocalCache;
 import com.theomenden.bismuth.client.Bismuth;
+import com.theomenden.bismuth.colors.BismuthExtendedColorResolver;
 import com.theomenden.bismuth.colors.mapping.BiomeColorMappings;
+import com.theomenden.bismuth.models.records.BiomeColorTypes;
 import com.theomenden.bismuth.models.records.Coordinates;
+import com.theomenden.bismuth.utils.ColorBlending;
+import com.theomenden.bismuth.utils.ColorCachingUtils;
+import com.theomenden.bismuth.utils.CompatibilityUtils;
+import com.theomenden.bismuth.utils.DebugUtils;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import net.minecraft.client.color.block.BlockTintCache;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.Holder;
-import net.minecraft.core.QuartPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.CubicSampler;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.WritableLevelData;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3d;
-import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Supplier;
 
 @Mixin(ClientLevel.class)
 public abstract class ClientLevelMixin extends Level {
-    private ClientLevelMixin(WritableLevelData levelData, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimensionTypeRegistration, Supplier<ProfilerFiller> profiler, boolean isClientSide, boolean isDebug, long biomeZoomSeed, int maxChainedNeighborUpdates) {
+    @Final
+    @Shadow
+    private final Object2ObjectArrayMap<ColorResolver, BlockTintCache> tintCaches = new Object2ObjectArrayMap<>();
+
+    @Shadow public abstract int calculateBlockTint(BlockPos blockPos, ColorResolver colorResolver);
+
+    protected ClientLevelMixin(WritableLevelData levelData, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimensionTypeRegistration, Supplier<ProfilerFiller> profiler, boolean isClientSide, boolean isDebug, long biomeZoomSeed, int maxChainedNeighborUpdates) {
         super(levelData, dimension, registryAccess, dimensionTypeRegistration, profiler, isClientSide, isDebug, biomeZoomSeed, maxChainedNeighborUpdates);
+    }
+
+    @Inject(method = "clearTintCaches", at = @At("HEAD"))
+    public void onClearColorCaches(CallbackInfo ci) {
+        this.tintCaches.entrySet().removeIf(entry -> entry.getKey() instanceof BismuthExtendedColorResolver);
+    }
+
+    @Inject(
+            method = "getBlockTint",
+            at = @At("HEAD")
+    )
+    private void onGetBlockTint(BlockPos blockPos, ColorResolver colorResolver, CallbackInfoReturnable<Integer> cir) {
+        if(this.tintCaches.get(colorResolver) == null) {
+            this.tintCaches.put(colorResolver, new BlockTintCache(pos1 -> this.calculateBlockTint(pos1, colorResolver)));
+        }
     }
 
     @ModifyArg(

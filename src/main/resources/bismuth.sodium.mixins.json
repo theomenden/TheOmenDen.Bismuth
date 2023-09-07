@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "com.theomenden.bismuth.mixin.sodium",
+  "compatibilityLevel": "JAVA_17",
+  "plugin": "com.theomenden.bismuth.mixin.sodium.SodiumFilterPlugin",
+  "client": [
+    "SodiumBlockColorsMixin",
+    "SodiumItemColorsMixin",
+    "SodiumBiomeManagerAccessor",
+    "SodiumClientLevelMixin",
+    "SodiumGameOptionsPageMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

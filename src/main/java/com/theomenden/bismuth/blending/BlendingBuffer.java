@@ -3,33 +3,21 @@ package com.theomenden.bismuth.blending;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
 public class BlendingBuffer {
-    @Getter
     private final float[] color;
-    @Getter
     private final float[] blend;
-    @Getter
     private final float[] sum;
-    @Getter
     private final int blendingRadius;
-    @Getter
     private final int sliceSizeLog2;
-    @Getter
     private final int blockSizeLog2;
-    @Getter
     private final int sliceSize;
-    @Getter
     private final int blockSize;
-    @Getter
     private final int blendingSize;
-    @Getter
     private final int blendingBufferSize;
-    @Getter
     private final int scaledBlendingDiameter;
-    @Getter
     @Setter
     private int colorBitsExclusive;
-    @Getter
     @Setter
     private int colorBitsInclusive;
 
@@ -46,9 +34,12 @@ public class BlendingBuffer {
 
         this.scaledBlendingDiameter = (2 * blendingRadius) >> blockSizeLog2;
 
-        this.color = new float[3 * (int)(Math.pow(blendingBufferSize, 3))];
-        this.blend = new float[3 * (int)(Math.pow(blendingBufferSize, 2))];
-        this.sum = new float[3 * (int)(Math.pow(blendingBufferSize, 2))];
+        final int squaredBufferSize = 3 * blendingBufferSize * blendingBufferSize;
+        final int cubedBufferSize = 3 * blendingBufferSize * blendingBufferSize * blendingBufferSize;
+
+        this.color = new float[cubedBufferSize];
+        this.blend = new float[squaredBufferSize];
+        this.sum = new float[squaredBufferSize];
 
         colorBitsExclusive = 0xFFFFFFFF;
         colorBitsInclusive = 0;

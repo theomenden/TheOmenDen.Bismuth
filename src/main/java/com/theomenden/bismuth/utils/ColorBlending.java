@@ -1,20 +1,16 @@
 package com.theomenden.bismuth.utils;
 
-import com.ibm.icu.impl.Utility;
 import com.theomenden.bismuth.blending.BlendingBuffer;
 import com.theomenden.bismuth.blending.BlendingChunk;
 import com.theomenden.bismuth.blending.BlendingConfig;
-import com.theomenden.bismuth.caching.caches.ColorBlendingCache;
 import com.theomenden.bismuth.caching.caches.ColorCache;
 import com.theomenden.bismuth.caching.strategies.ColorSlice;
 import com.theomenden.bismuth.client.Bismuth;
 import com.theomenden.bismuth.models.NonBlockingThreadLocal;
 import com.theomenden.bismuth.models.debug.DebugEvent;
 import com.theomenden.bismuth.models.enums.InternalEventType;
-import com.theomenden.bismuth.models.records.BiomeColorTypes;
 import com.theomenden.bismuth.models.records.Coordinates;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.Level;
@@ -22,17 +18,17 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
+import org.apache.commons.lang3.Range;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.random.RandomGenerator;
 
 public class ColorBlending {
-    public static final int SAMPLE_SEED_X = 1664525;
-    public static final int SAMPLE_SEED_Y = 214013;
-    public static final int SAMPLE_SEED_Z = 16807;
+    public static final int SAMPLE_SEED_X = 1_664_525;
+    public static final int SAMPLE_SEED_Y = 214_013;
+    public static final int SAMPLE_SEED_Z = 16_807;
 
-    public static final ThreadLocal<BlendingBuffer> threadLocalBlendBuffer = new ThreadLocal<>();
+    public static final ThreadLocal<BlendingBuffer> threadLocalBlendBuffer = new NonBlockingThreadLocal<>();
 
     public static BlendingBuffer acquireBlendBuffer(int blendRadius) {
         BlendingBuffer result;
@@ -54,7 +50,7 @@ public class ColorBlending {
         threadLocalBlendBuffer.set(buffer);
     }
 
-    public static int getSliceMin(int blendRadius, int blockSizeLog2, int sliceSizeLog2, int sliceIndex) {
+    public static int getSliceMinimum(int blendRadius, int blockSizeLog2, int sliceSizeLog2, int sliceIndex) {
         final int sliceSize = 1 << sliceSizeLog2;
         final int scaledSliceSize = sliceSize >> blockSizeLog2;
 
@@ -63,9 +59,12 @@ public class ColorBlending {
 
         int result = 0;
 
-        if (sliceIndex == -1) {
+        if (sliceIndex == -1)
+        {
             result = scaledSliceSize - scaledLowerBlendRadius;
         }
+
+
 
         return result;
     }
@@ -74,7 +73,7 @@ public class ColorBlending {
         return sliceSize >> blockSizeLog2;
     }
 
-    public static int getBlendMin(int blendRadius, int blockSizeLog2, int sliceSizeLog2, int sliceIndex) {
+    public static int getBlendingMinimum(int blendRadius, int blockSizeLog2, int sliceSizeLog2, int sliceIndex) {
         final int sliceSize =  1 << sliceSizeLog2;
         final int scaledSliceSize = sliceSize >> blockSizeLog2;
 
@@ -94,7 +93,7 @@ public class ColorBlending {
         return result;
     }
 
-    public static int getSliceMax(int blendRadius, int blockSizeLog2, int sliceSizeLog2, int sliceIndex) {
+    public static int getSliceMaximum(int blendRadius, int blockSizeLog2, int sliceSizeLog2, int sliceIndex) {
         final int sliceSize = 1 << sliceSizeLog2;
         final int scaledSliceSize = sliceSize >> blockSizeLog2;
 
@@ -157,15 +156,11 @@ public class ColorBlending {
     public static int getRandomSamplePosition(int min, int blockSizeLog2, int seed) {
         int blockMask = MathUtils.createLowerBitMask(blockSizeLog2);
 
-        int random = LCGUtils
-                .generateRandomNoise(seed)
-                .findFirst()
-                .orElse(RandomGenerator
-                        .getDefault()
-                        .nextInt());
+        int random = LCGUtils.generateLCG(min, seed);
+
         int offset = random & blockMask;
 
-        return  min + offset;
+        return min + offset;
     }
 
     public static void gatherColorsForSlice(
@@ -190,21 +185,21 @@ public class ColorBlending {
         final int blendSize = blendBuffer.getBlendingSize();
 
         final Coordinates sliceMinimums = new Coordinates(
-        getSliceMin(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDX),
-        getSliceMin(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDY),
-        getSliceMin(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDZ)
+        getSliceMinimum(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDX),
+        getSliceMinimum(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDY),
+        getSliceMinimum(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDZ)
         );
 
         final Coordinates sliceMaximums = new Coordinates(
-        getSliceMax(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDX),
-        getSliceMax(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDY),
-        getSliceMax(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDZ)
+        getSliceMaximum(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDX),
+        getSliceMaximum(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDY),
+        getSliceMaximum(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDZ)
         );
 
         final Coordinates blendingMinimums = new Coordinates(
-        getBlendMin(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDX),
-        getBlendMin(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDY),
-        getBlendMin(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDZ)
+        getBlendingMinimum(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDX),
+        getBlendingMinimum(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDY),
+        getBlendingMinimum(blendRadius, blockSizeLog2, sliceSizeLog2, sliceIDZ)
         );
 
         final Coordinates dimensionCoordinates = new Coordinates(
@@ -429,28 +424,24 @@ public class ColorBlending {
     }
 
     public static void blendColorsForSlice(BlendingBuffer buffer, BlendingChunk blendChunk, int inputX, int inputY, int inputZ) {
-        final int srcSize = BlendingConfig.getBlendingSize(buffer.getBlendingRadius());
-        final int dstSize = BlendingConfig.getSliceSize(buffer.getBlendingRadius());
+        final int sourceBlendingSize = BlendingConfig.getBlendingSize(buffer.getBlendingRadius());
+        final int destinationConfigSize = BlendingConfig.getSliceSize(buffer.getBlendingRadius());
 
         final int blendBufferDim = BlendingConfig.getBlendingBufferSize(buffer.getBlendingRadius());
 
         final int filterSupport = BlendingConfig.getFilterSupport(buffer.getBlendingRadius());
         final int fullFilterDim = filterSupport - 1;
-        final int scaledDstSize = dstSize >> buffer.getBlockSizeLog2();
-
+        final int scaledDstSize = destinationConfigSize >> buffer.getBlockSizeLog2();
         final int blockSize = buffer.getBlockSize();
-
         final float oneOverBlockSize = (1.0f / blockSize);
-
         final float filter = (float) (filterSupport - 1) + oneOverBlockSize;
-        final float filterScalar = (float) (1.0f / Math.pow(filter, 3));
-
+        final float filterScalar = (1.0f / (filter * filter * filter));
         final int sliceSizeLog2 = buffer.getSliceSizeLog2();
-
         final Coordinates sliceCoordinates  = new Coordinates(
         resolveScaledResults(sliceSizeLog2, inputX),
         resolveScaledResults(sliceSizeLog2, inputY),
         resolveScaledResults(sliceSizeLog2, inputZ));
+
 
         int baseX = sliceCoordinates.x() << sliceSizeLog2;
         int baseY = sliceCoordinates.y() << sliceSizeLog2;
@@ -469,12 +460,12 @@ public class ColorBlending {
         int newResultIndexZ = baseIndex;
 
         for (int z = 0;
-             z < srcSize;
+             z < sourceBlendingSize;
              ++z) {
             int newXIndex = 0;
 
             for (int newX = 0;
-                 newX < srcSize;
+                 newX < sourceBlendingSize;
                  ++newX) {
                 int newSourceIndexForY = newXIndex + newBufferIndexZ;
                 int newDestinationIndexForY = newXIndex;
@@ -541,10 +532,10 @@ public class ColorBlending {
                 int newIndexY = 0;
 
                 for (int newY = 0;
-                     newY < dstSize;
+                     newY < destinationConfigSize;
                      ++newY) {
-                    int newSrcIndexX = newIndexY;
-                    int newDstIndexX = newIndexY + newBufferIndexZ;
+                    int newSourceXIndex = newIndexY;
+                    int newDestinationXIndex = newIndexY + newBufferIndexZ;
                     int newSumIndexX = newIndexY;
 
                     float sumR = 0;
@@ -554,28 +545,30 @@ public class ColorBlending {
                     for (int newX = 0;
                          newX < fullFilterDim;
                          ++newX) {
-                        sumR += buffer.getBlend()[newSrcIndexX];
-                        sumG += buffer.getBlend()[newSrcIndexX + 1];
-                        sumB += buffer.getBlend()[newSrcIndexX + 2];
+                        sumR += buffer.getBlend()[newSourceXIndex];
+                        sumG += buffer.getBlend()[newSourceXIndex + 1];
+                        sumB += buffer.getBlend()[newSourceXIndex + 2];
 
-                        newSrcIndexX += 3;
+                        newSourceXIndex += 3;
                     }
 
                     int lowerOffset = 0;
                     int upperOffset = 3 * fullFilterDim;
 
-                    newSrcIndexX = newIndexY;
+                    newSourceXIndex = newIndexY;
 
                     for (int newX = 0;
                          newX < scaledDstSize;
                          ++newX) {
-                        float lowerR = buffer.getBlend()[newSrcIndexX + lowerOffset] * oneOverBlockSize;
-                        float lowerG = buffer.getBlend()[newSrcIndexX + lowerOffset + 1] * oneOverBlockSize;
-                        float lowerB = buffer.getBlend()[newSrcIndexX + lowerOffset + 2] * oneOverBlockSize;
 
-                        float upperR = buffer.getBlend()[newSrcIndexX + upperOffset] * oneOverBlockSize;
-                        float upperG = buffer.getBlend()[newSrcIndexX + upperOffset + 1] * oneOverBlockSize;
-                        float upperB = buffer.getBlend()[newSrcIndexX + upperOffset + 2] * oneOverBlockSize;
+                        var blendingBuffer = buffer.getBlend();
+
+                        float lowerR = blendingBuffer[newSourceXIndex + lowerOffset] * oneOverBlockSize;
+                        float lowerG = blendingBuffer[newSourceXIndex + lowerOffset + 1] * oneOverBlockSize;
+                        float lowerB = blendingBuffer[newSourceXIndex + lowerOffset + 2] * oneOverBlockSize;
+                        float upperR = blendingBuffer[newSourceXIndex + upperOffset] * oneOverBlockSize;
+                        float upperG = blendingBuffer[newSourceXIndex + upperOffset + 1] * oneOverBlockSize;
+                        float upperB = blendingBuffer[newSourceXIndex + upperOffset + 2] * oneOverBlockSize;
 
                         for (int i = 0;
                              i < blockSize;
@@ -584,9 +577,9 @@ public class ColorBlending {
                             sumG += upperG;
                             sumB += upperB;
 
-                            buffer.setColorAtIndex(newDstIndexX,sumR);
-                            buffer.setColorAtIndex(newDstIndexX + 1,sumG);
-                            buffer.setColorAtIndex(newDstIndexX + 2,sumB);
+                            buffer.setColorAtIndex(newDestinationXIndex,sumR);
+                            buffer.setColorAtIndex(newDestinationXIndex + 1,sumG);
+                            buffer.setColorAtIndex(newDestinationXIndex + 2,sumB);
 
                             buffer.setSumAtIndex(newSumIndexX,sumR);
                             buffer.setSumAtIndex(newSumIndexX + 1,sumG);
@@ -596,11 +589,11 @@ public class ColorBlending {
                             sumG -= lowerG;
                             sumB -= lowerB;
 
-                            newDstIndexX += 3;
+                            newDestinationXIndex += 3;
                             newSumIndexX += 3;
                         }
 
-                        newSrcIndexX += 3;
+                        newSourceXIndex += 3;
                     }
 
                     newIndexY += 3 * blendBufferDim;
@@ -610,11 +603,11 @@ public class ColorBlending {
                 int indexX = 0;
 
                 for (int newY = 0;
-                     newY < dstSize;
+                     newY < destinationConfigSize;
                      ++newY) {
-                    int srcIndexZ = indexX;
-                    int dstIndexZ = indexX + newBufferIndexZ;
-                    int sumIndexZ = indexX;
+                    int sourceZIndex = indexX;
+                    int destinationZIndex = indexX + newBufferIndexZ;
+                    int sumZIndex = indexX;
 
                     float sumR = 0;
                     float sumG = 0;
@@ -623,30 +616,32 @@ public class ColorBlending {
                     for (int newX = 0;
                          newX < fullFilterDim;
                          ++newX) {
-                        sumR += buffer.getBlend()[srcIndexZ];
-                        sumG += buffer.getBlend()[srcIndexZ + 1];
-                        sumB += buffer.getBlend()[srcIndexZ + 2];
+                        float[] bufferBlend = buffer.getBlend();
+                        sumR += bufferBlend[sourceZIndex];
+                        sumG += bufferBlend[sourceZIndex + 1];
+                        sumB += bufferBlend[sourceZIndex + 2];
 
-                        srcIndexZ += 3;
+                        sourceZIndex += 3;
                     }
 
                     int lowerOffset = 0;
                     int upperOffset = 3 * fullFilterDim;
 
-                    srcIndexZ = indexX;
+                    sourceZIndex = indexX;
 
                     int finalIndexZ = newResultIndexZ + resultOffsetX;
 
                     for (int newX = 0;
                          newX < scaledDstSize;
                          ++newX) {
-                        float lowerR = buffer.getBlend()[srcIndexZ + lowerOffset] * oneOverBlockSize;
-                        float lowerG = buffer.getBlend()[srcIndexZ + lowerOffset + 1] * oneOverBlockSize;
-                        float lowerB = buffer.getBlend()[srcIndexZ + lowerOffset + 2] * oneOverBlockSize;
+                        float[] bufferBlend = buffer.getBlend();
+                        float lowerR = bufferBlend[sourceZIndex + lowerOffset] * oneOverBlockSize;
+                        float lowerG = bufferBlend[sourceZIndex + lowerOffset + 1] * oneOverBlockSize;
+                        float lowerB = bufferBlend[sourceZIndex + lowerOffset + 2] * oneOverBlockSize;
 
-                        float upperR = buffer.getBlend()[srcIndexZ + upperOffset] * oneOverBlockSize;
-                        float upperG = buffer.getBlend()[srcIndexZ + upperOffset + 1] * oneOverBlockSize;
-                        float upperB = buffer.getBlend()[srcIndexZ + upperOffset + 2] * oneOverBlockSize;
+                        float upperR = bufferBlend[sourceZIndex + upperOffset] * oneOverBlockSize;
+                        float upperG = bufferBlend[sourceZIndex + upperOffset + 1] * oneOverBlockSize;
+                        float upperB = bufferBlend[sourceZIndex + upperOffset + 2] * oneOverBlockSize;
 
                         int lowerYOffset = 3 * -(filterSupport - 1) * blendBufferDim * blendBufferDim;
 
@@ -657,13 +652,16 @@ public class ColorBlending {
                             sumG += upperG;
                             sumB += upperB;
 
-                            buffer.setColorAtIndex(dstIndexZ, sumR);
-                            buffer.setColorAtIndex(dstIndexZ + 1,  sumG);
-                            buffer.setColorAtIndex(dstIndexZ + 2, sumB);
+                            buffer.setColorAtIndex(destinationZIndex, sumR);
+                            buffer.setColorAtIndex(destinationZIndex + 1,  sumG);
+                            buffer.setColorAtIndex(destinationZIndex + 2, sumB);
 
-                            float lowerYRV = buffer.getColor()[dstIndexZ + lowerYOffset];
-                            float lowerYGV = buffer.getColor()[dstIndexZ + lowerYOffset + 1];
-                            float lowerYBV = buffer.getColor()[dstIndexZ + lowerYOffset + 2];
+                            var blendingColorBuffer = buffer.getColor();
+                            var blendingSumBuffer = buffer.getSum();
+
+                            float lowerYRV = blendingColorBuffer[destinationZIndex + lowerYOffset];
+                            float lowerYGV = blendingColorBuffer[destinationZIndex + lowerYOffset + 1];
+                            float lowerYBV = blendingColorBuffer[destinationZIndex + lowerYOffset + 2];
 
                             float lowerYR = lowerYRV * oneOverBlockSize;
                             float lowerYG = lowerYGV * oneOverBlockSize;
@@ -673,9 +671,9 @@ public class ColorBlending {
                             float upperYG = sumG * oneOverBlockSize;
                             float upperYB = sumB * oneOverBlockSize;
 
-                            float valueR = buffer.getSum()[sumIndexZ];
-                            float valueG = buffer.getSum()[sumIndexZ + 1];
-                            float valueB = buffer.getSum()[sumIndexZ + 2];
+                            float valueR = blendingSumBuffer[sumZIndex];
+                            float valueG = blendingSumBuffer[sumZIndex + 1];
+                            float valueB = blendingSumBuffer[sumZIndex + 2];
 
                             for (int j = 0;
                                  j < blockSize;
@@ -697,21 +695,21 @@ public class ColorBlending {
                                 valueB -= lowerYB;
                             }
 
-                            buffer.setSumAtIndex(sumIndexZ,sumR - lowerYRV);
-                            buffer.setSumAtIndex(sumIndexZ + 1, sumG - lowerYGV);
-                            buffer.setSumAtIndex(sumIndexZ + 2, sumB - lowerYBV);
+                            buffer.setSumAtIndex(sumZIndex,sumR - lowerYRV);
+                            buffer.setSumAtIndex(sumZIndex + 1, sumG - lowerYGV);
+                            buffer.setSumAtIndex(sumZIndex + 2, sumB - lowerYBV);
 
                             sumR -= lowerR;
                             sumG -= lowerG;
                             sumB -= lowerB;
 
-                            dstIndexZ += 3;
-                            sumIndexZ += 3;
+                            destinationZIndex += 3;
+                            sumZIndex += 3;
 
                             finalIndexZ += 1;
                         }
 
-                        srcIndexZ += 3;
+                        sourceZIndex += 3;
                     }
 
                     indexX += 3 * blendBufferDim;
@@ -817,24 +815,22 @@ public class ColorBlending {
         if (neighborsAreLoaded) {
             int indexZ = baseIndex;
 
-            int indexY = indexZ;
-            int worldZ = baseCoordinates.z();
-            for (int z = 0; z < sliceSize; ++z) {
-                for (int y = 0; y < sliceSize; ++y) {
-                    int indexX = indexY;
+            for(int z = 0; z < sliceSize; ++z) {
+                int indexY = indexZ;
+                int worldZ = baseCoordinates.z() + z;
+                for(int y = 0; y < sliceSize; ++y) {
                     int worldY = baseCoordinates.y() + y;
-                    int worldX = baseCoordinates.x();
-                    for (int x = 0; x < sliceSize; ++x) {
+                    for(int x = 0; x < sliceSize; ++x) {
+                        int worldX = baseCoordinates.x() + x;
                         blockPos.set(worldX, worldY, worldZ);
+
                         int color = getColorAtPosition(world, blockPos, worldX, worldZ, colorResolver);
-                        blendChunk.data[indexX] = color;
-                        worldX++;
-                        indexX++;
+
+                        blendChunk.data[indexY + x] = color;
                     }
-                    indexY += sliceSize;
+                    indexY += 16;
                 }
-                indexZ += sliceSize * sliceSize;
-                worldZ += 1;
+                indexZ += 256;
             }
         } else {
             Coordinates centerCoordinates = new Coordinates(
@@ -861,8 +857,8 @@ public class ColorBlending {
         DebugEvent debugEvent = DebugUtils.putColorEvent(coordinates, colorType);
         final int blendRadius = Bismuth.configuration.blendingRadius;
 
-        if (blendRadius > BlendingConfig.BIOME_MINIMUM_BLENDING_RADIUS &&
-                blendRadius <= BlendingConfig.BIOME_MAXIMUM_BLENDING_RADIUS) {
+        if (Range.between(BlendingConfig.BIOME_MINIMUM_BLENDING_RADIUS + 1, BlendingConfig.BIOME_MAXIMUM_BLENDING_RADIUS)
+                 .contains(blendRadius)) {
             BlendingBuffer blendBuffer = acquireBlendBuffer(blendRadius);
 
             gatherColorsToBlendBuffer(

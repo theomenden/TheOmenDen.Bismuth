@@ -6,12 +6,9 @@ public record BismuthColor(int rgb) {
     public BismuthColor(int r, int g, int b) {
         this(r << 16 | g << 8 | b);
     }
-
-
     public BismuthColor(String hex) {
         this(Integer.parseInt(hex, 16));
     }
-
     private static int hslToRgb(float h, float s, float l) {
         float r, g, b;
         if (s == 0) {
@@ -26,7 +23,6 @@ public record BismuthColor(int rgb) {
 
         return Math.round((r * 255)) << 16 | Math.round((g * 255)) << 8 | Math.round((b * 255));
     }
-
     private static float hueToRgb(float p, float q, float t) {
         if(t < 0f) t+= 1f;
         if(t > 1f) t-= 1f;
@@ -35,7 +31,6 @@ public record BismuthColor(int rgb) {
         if(t < 2/3f) return p + (q - p) * (2f/3f - t) * 6f;
         return p;
     }
-
     public BismuthColor adjustBrightness(float factor) {
         int r = Range
                 .between(0,255).fit((int)(((rgb >> 16) & 0xFF)* factor));

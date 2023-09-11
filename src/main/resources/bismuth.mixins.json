@@ -3,11 +3,6 @@
   "minVersion": "0.8",
   "package": "com.theomenden.bismuth.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
-    "client.ChatStyleMixin",
-    "coloring.dye.DyeColorMixin",
-    "coloring.dye.SheepEntityMixin"
-  ],
   "client": [
     "biome.BiomeColorsMixin",
     "client.ClientLevelMixin",
@@ -15,10 +10,14 @@
     "client.MinecraftClientMixin",
     "client.OptionsMixin",
     "client.ResourceLocationMixin",
+    "client.ChatStyleMixin",
+    "client.VideoSettingsScreenMixin",
+    "coloring.dye.DyeColorMixin",
+    "coloring.dye.SheepEntityMixin",
     "coloring.TextureManagerMixin",
     "coloring.blocks.BlockColorsAccessor",
     "coloring.blocks.BlockColorsMixin",
-    "coloring.blocks.LevelBlockMixin",
+    "coloring.blocks.LeverBlockMixin",
     "coloring.blocks.MaterialColorMixin",
     "coloring.dye.BannerBlockEntityRendererMixin",
     "coloring.dye.WolfCollarFeatureRendererMixin",
@@ -44,6 +43,8 @@
     "renderers.FluidRendererMixin",
     "renderers.LevelRendererMixin",
     "renderers.LightTextureMixin"
+  ],
+  "mixins": [
   ],
   "injectors": {
     "defaultRequire": 1

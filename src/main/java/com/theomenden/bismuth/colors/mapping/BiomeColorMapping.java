@@ -137,6 +137,6 @@ public class BiomeColorMapping implements BismuthResolver {
                 return 0xffffffff;
             }
         }
-        throw new AssertionError("Unknown color mapping format: " + properties.getFormat());
+        throw new AssertionError();
     }
 }

@@ -2,11 +2,11 @@ package com.theomenden.bismuth.colors.mapping;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.theomenden.bismuth.client.Bismuth;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LightMapping {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bismuth.MODID);
 
     private final NativeImage lightMap;
 

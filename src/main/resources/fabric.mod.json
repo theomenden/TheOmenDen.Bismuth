@@ -34,8 +34,7 @@
       "update_checker": true
     },
     "sodium:options": {
-      "mixin.features.fast_biome_colors": false,
-      "mixin.options.biomeBlendRadius": false
+      "mixin.features.fast_biome_colors": false
     }
   },
   "accessWidener": "bismuth.accesswidener",

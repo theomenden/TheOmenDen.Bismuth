@@ -20,12 +20,12 @@ jobs:
         uses: gradle/gradle-build-action@v2
       - name: Execute Gradle build
         run: ./gradlew build
-#      - name: 'MC Publish'
-#        uses: Kir-Antipov/mc-publish@v3.3
-#        with:
-#          modrinth-id: lS2PKjpV
-#          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-#          modrinth-featured: true
+      - name: 'MC Publish'
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: nl0Cdq9L
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-featured: true
   qodana:
     runs-on: ubuntu-latest
     steps:

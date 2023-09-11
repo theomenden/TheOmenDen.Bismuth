@@ -48,7 +48,7 @@ public final class CompatibilityUtils {
             result = addColorResolver(resolver);
         }
 
-        return  result;
+        return result;
     }
 
 }

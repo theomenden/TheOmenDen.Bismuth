@@ -97,18 +97,14 @@ public class GlobalColorProperties {
         if(settings.text != null) {
             TextColorSettings text = settings.text;
             this.textColor = new HashMap<>();
-            text.code
-                    .forEach((key, value) -> {
+            text.code.forEach((key, value) -> {
                         int code = key;
                         if (code < 16) {
                             ChatFormatting color = ChatFormatting.getById(code);
-                            textColor.put(color, TextColor.fromRgb(value
-                                    .rgb()));
+                            textColor.put(color, TextColor.fromRgb(value.rgb()));
                         }
                     });
-            text.format
-                    .forEach((key, value) -> this.textColor.put(key, TextColor.fromRgb(value
-                            .rgb())));
+            text.format.forEach((key, value) -> this.textColor.put(key, TextColor.fromRgb(value.rgb())));
             text.code = Collections.emptyMap();
             text.format = Collections.emptyMap();
             this.text = text;

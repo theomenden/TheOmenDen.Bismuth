@@ -33,7 +33,7 @@ public abstract class SodiumGameOptionsPageMixin {
                                           .setName(Component.translatable("text.autoconfig.bismuth.option.blendingRadius"))
                                           .setTooltip(Component.translatable("text.autoconfig.bismuth.option.blendingRadius.@Tooltip"))
                                           .setControl(option -> new SliderControl(option, 0, 14, 1, ControlValueFormatter.biomeBlend()))
-                                          .setBinding((opts, value) -> Bismuth.configuration.blendingRadius = value, opts -> Bismuth.configuration.blendingRadius)
+                                          .setBinding((opts, value) -> Bismuth.bismuthBlendingRadius.set(value), opts -> Bismuth.bismuthBlendingRadius.get())
                                           .setImpact(OptionImpact.LOW)
                                           .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD)
                                           .build())

@@ -101,8 +101,7 @@ public class ColorMappingProperties {
             this.columnsByBiome = null;
         }
     }
-
-
+    
     public ColumnBounds getColumn(ResourceKey<Biome> biomeKey, ResourceKey<Registry<Biome>> biomeRegistry) {
         if(format == Format.GRID) {
             if(biomeKey != null) {

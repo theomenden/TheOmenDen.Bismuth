@@ -1,5 +1,6 @@
 package com.theomenden.bismuth.colors.mapping;
 
+import com.google.common.collect.Sets;
 import com.theomenden.bismuth.colors.interfaces.BismuthResolver;
 import com.theomenden.bismuth.defaults.DefaultBismuthResolverProviders;
 import com.theomenden.bismuth.models.ColorMappingProperties;
@@ -25,6 +26,11 @@ public final class BiomeColorMappings {
     private static final ColorMappingStorage<ResourceLocation> skyFogColorMappings = new ColorMappingStorage<>(DefaultBismuthResolverProviders.SKY_FOG_PROVIDER);
     private static final ColorMappingStorage<Fluid> fluidFogColorMappings = new ColorMappingStorage<>(DefaultBismuthResolverProviders.FLUID_FOG_PROVIDER);
 
+    private static final Set<String> skyKeys = Sets.newHashSet("bismuth:sky", "vanadium:sky", "colormatic:sky");
+    private static final Set<String> skyFogKeys = Sets.newHashSet("bismuth:sky_fog", "vanadium:sky_fog", "colormatic:sky_fog");
+    private static final Set<String> fluidFogKeys = Sets.newHashSet("bismuth:fluid_fog", "vanadium:fluid_fog", "colormatic:fluid_fog");
+
+
     private BiomeColorMappings(){
     }
 
@@ -45,20 +51,21 @@ public final class BiomeColorMappings {
         Set<ResourceLocation> biomes = props.getApplicableBiomes();
         colorMappingsByBlockState.addColorMapping(biomeColorMap, props.getApplicableBlockStates(), biomes);
         colorMappingsByBlock.addColorMapping(biomeColorMap, props.getApplicableBlocks(), biomes);
+
         props
                 .getApplicableSpecialIds()
-                .forEach((key, value) -> {
-                    switch (key
-                            .toString()) {
-                        case "vanadium:sky", "colormatic:sky" -> skycolorMappings.addColorMapping(biomeColorMap, value, biomes);
-                        case "vanadium:sky_fog", "colormatic:sky_fog" -> skyFogColorMappings.addColorMapping(biomeColorMap, value, biomes);
-                        case "vanadium:fluid_fog", "colormatic:fluid_fog" -> {
-                            Collection<Fluid> fluids = value
-                                    .stream()
-                                    .map(BuiltInRegistries.FLUID::get)
-                                    .collect(Collectors.toList());
-                            fluidFogColorMappings.addColorMapping(biomeColorMap, fluids, biomes);
-                        }
+                .forEach((key1, value) -> {
+                    String key = key1.toString();
+                    if (skyKeys.contains(key)) {
+                        skycolorMappings.addColorMapping(biomeColorMap, value, biomes);
+                    } else if (skyFogKeys.contains(key)) {
+                        skyFogColorMappings.addColorMapping(biomeColorMap, value, biomes);
+                    } else if (fluidFogKeys.contains(key)) {
+                        Collection<Fluid> fluids = value
+                                .stream()
+                                .map(BuiltInRegistries.FLUID::get)
+                                .collect(Collectors.toList());
+                        fluidFogColorMappings.addColorMapping(biomeColorMap, fluids, biomes);
                     }
                 });
     }

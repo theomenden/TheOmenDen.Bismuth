@@ -15,11 +15,8 @@ import java.util.concurrent.Executor;
 
 @Mixin(ModelManager.class)
 public abstract class ModelManagerMixin {
-    @Inject(
-            method="reload",
-            at = @At("HEAD")
-    )
-    private void reloadVanadiumCustomBiomeColors(PreparableReloadListener.PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+    @Inject(method= "reload(Lnet/minecraft/server/packs/resources/PreparableReloadListener$PreparationBarrier;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;Lnet/minecraft/util/profiling/ProfilerFiller;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At("HEAD"))
+    public void reloadBismuthCustomBiomeColors(PreparableReloadListener.PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
         BismuthColormaticResolution.CUSTOM_BLOCK_COLORS.onResourceManagerReload(resourceManager);
         BismuthColormaticResolution.COLORMATIC_CUSTOM_BLOCK_COLORS.onResourceManagerReload(resourceManager);
     }

@@ -7,7 +7,7 @@ public final class ColorCachingUtils {
     public static final int INVALID_CHUNK_KEY = -1;
 
     public static int getArrayIndex(int dimension, int x, int y, int z) {
-        return x + dimension * (y + (z * dimension));
+        return x + (dimension) * (y + z * dimension);
     }
 
     public static int getArrayIndex(int dimension, Coordinates coordinates) {

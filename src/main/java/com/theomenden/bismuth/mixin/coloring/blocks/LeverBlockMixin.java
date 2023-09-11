@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(LeverBlock.class)
-public abstract class LevelBlockMixin extends Block {
-    public LevelBlockMixin(Properties properties) {
+public abstract class LeverBlockMixin extends Block {
+    public LeverBlockMixin(Properties properties) {
         super(properties);
     }
 

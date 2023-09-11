@@ -10,6 +10,9 @@
     "SodiumClientLevelMixin",
     "SodiumGameOptionsPageMixin"
   ],
+  "mixins": [
+
+  ],
   "injectors": {
     "defaultRequire": 1
   }

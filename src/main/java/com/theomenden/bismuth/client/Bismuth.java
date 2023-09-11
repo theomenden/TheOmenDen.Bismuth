@@ -7,10 +7,14 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.client.Options;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -28,6 +32,24 @@ public class Bismuth implements ClientModInitializer {
     public static final String MODID = "bismuth";
     public static final String COLORMATIC_ID = "colormatic";
     public static final ResourceLocation OVERWORLD = ResourceLocation.tryBuild("minecraft","overworld");
+
+    public static OptionInstance<Integer> bismuthBlendingRadius = new OptionInstance<>(
+            "text.autoconfig.bismuth.option.blendingRadius",
+            OptionInstance.noTooltip(),
+            (component, integer) -> {
+                int diameter = integer * 2 + 1;
+                return Options.genericValueLabel(component, Component.translatable("text.autoconfig.bismuth.option.blendingRadius." + diameter));
+            },
+            new OptionInstance.IntRange(0, 14),
+            14,
+            (integer) -> Minecraft.getInstance().levelRenderer.allChanged());
+
+    public static int
+    getBiomeBlendRadius()
+    {
+        return bismuthBlendingRadius.get();
+    }
+
 
     public static ResourceLocation getDimensionId(Level level) {
         DimensionType type = level.dimensionType();

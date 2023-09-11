@@ -27,11 +27,7 @@ public class ColorMappingResource implements SimpleResourceReloadListener<int[]>
         this.colormaticLocation = new ResourceLocation(Bismuth.COLORMATIC_ID, resourceLocation.getPath());
     }
 
-    @Override
-    public String getName() {
-        return SimpleResourceReloadListener.super.getName();
-    }
-
+    @SuppressWarnings("deprecation")
     @Override
     public CompletableFuture<int[]> load(ResourceManager manager, ProfilerFiller profiler, Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
@@ -60,21 +56,21 @@ public class ColorMappingResource implements SimpleResourceReloadListener<int[]>
         return resourceLocation;
     }
 
-    private int[] attemptToLoadFromColormaticNamespace(ResourceManager manager) {
+    @SuppressWarnings("deprecation")
+    private int @Nullable [] attemptToLoadFromColormaticNamespace(ResourceManager manager) {
         try{
             return LegacyStuffWrapper.getPixels(manager, colormaticLocation);
         }
         catch (IOException e) {
-            logger.error("Failed to load color mapping from Colormatic directory", e);
             return null;
         }
     }
 
-    private int[] attemptToLoadFromOptifineDirectory(ResourceManager manager) {
+    @SuppressWarnings("deprecation")
+    private int @Nullable [] attemptToLoadFromOptifineDirectory(ResourceManager manager) {
         try {
             return LegacyStuffWrapper.getPixels(manager, optifineLocation);
         } catch (IOException e) {
-            logger.error("Failed to load color mapping from Optifine directory", e);
             return null;
         }
     }

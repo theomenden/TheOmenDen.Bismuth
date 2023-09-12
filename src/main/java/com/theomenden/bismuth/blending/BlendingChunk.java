@@ -1,6 +1,5 @@
 package com.theomenden.bismuth.blending;
 
-import com.theomenden.bismuth.caching.caches.ColorBlendingCache;
 import com.theomenden.bismuth.utils.ColorCachingUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;

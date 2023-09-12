@@ -21,8 +21,8 @@ public abstract class MaterialColorMixin {
     )
     private void onCalculatingColor(MaterialColor.Brightness brightness, CallbackInfoReturnable<Integer> cir){
         var colorProperties = ObjectUtils.firstNonNull(
-                BismuthColormaticResolution.COLOR_PROPERTIES,
-                BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES
+                BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                BismuthColormaticResolution.COLOR_PROPERTIES
         );
 
         int color = colorProperties.getProperties().getMap((MaterialColor)(Object)this);

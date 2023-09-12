@@ -36,15 +36,15 @@ public abstract class ModelBakeryMixin {
             )
     );
 
-    @Dynamic("Lambda in bake")
+    @Dynamic("Lambda in #bake")
     @Inject(
             method = "method_45877",
-            at= @At(value ="INVOKE", ordinal = 0, shift = At.Shift.AFTER)
+            at= @At(value ="INVOKE", target = "Lnet/minecraft/client/resources/model/ModelBakery$ModelBakerImpl;bake(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/resources/model/BakedModel;")
     )
-    private void setModelIdContext(BiFunction biFunction, ResourceLocation id, CallbackInfo ci) {
+    private void setModelIdContext(BiFunction biFunction, ResourceLocation resourceLocation, CallbackInfo ci) {
         boolean finished = false;
         ModelIdContext.shouldTintCurrentModel = false;
-        if (id instanceof ModelResourceLocation modelId) {
+        if (resourceLocation instanceof ModelResourceLocation modelId) {
             BlockState blockState = null;
             if (modelId
                     .getVariant()

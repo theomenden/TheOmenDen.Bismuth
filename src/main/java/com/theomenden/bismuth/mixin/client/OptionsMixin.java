@@ -17,6 +17,6 @@ public abstract class OptionsMixin {
 
     @Inject(method = "processOptions", at = @At("HEAD"))
     private void preProccessingOptions(Options.FieldAccess accessor, CallbackInfo ci) {
-        accessor.process("bismuthBlendingRadius", Bismuth.configuration.blendingRadius);
+        accessor.process("bismuthBlendingRadius", Bismuth.bismuthBlendingRadius);
     }
 }

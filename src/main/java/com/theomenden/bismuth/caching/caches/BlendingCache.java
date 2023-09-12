@@ -30,8 +30,8 @@ public class BlendingCache {
 
         IntStream
                 .range(0, count)
-                .mapToObj(i -> new BlendingChunk())
-                .forEach(availableChunks::add);
+                .mapToObj(index -> new BlendingChunk())
+                .forEachOrdered(availableChunks::add);
     }
     public void invalidateChunk(int chunkXCoord, int chunkZCoord) {
         lock.lock();
@@ -42,21 +42,20 @@ public class BlendingCache {
             for (int x = -1; x <=1; ++x) {
                 long key = ColorCachingUtils.getChunkKey(chunkXCoord + x,0, chunkZCoord + z, 0);
 
-                    invalidatedHashedChunks.computeIfPresent(key, (k, current) -> {
-                        while (current != null) {
-                            BlendingChunk nextChunkToBlendAgainst = current.next;
-                            hashedChunks.remove(current.invalidationKey);
-                            removeChunkFromInvalidation(current);
-                            releaseChunkWithoutLocking(current);
+                BlendingChunk firstInvalidChunk = invalidatedHashedChunks.get(key);
 
-                            current.markAsInvalidated();
+                for(var currentChunk = firstInvalidChunk; currentChunk != null;) {
+                    var nextChunk = currentChunk.next;
 
-                            current = nextChunkToBlendAgainst;
-                        }
-                        return null;
-                    });
+                    hashedChunks.remove(currentChunk.key);
+
+                    removeChunkFromInvalidation(currentChunk);
+                    releaseChunkWithoutLocking(currentChunk);
+                    currentChunk.markAsInvalidated();
+                    currentChunk = nextChunk;
                 }
             }
+        }
         lock.unlock();
     }
     public void invalidateAllChunks() {
@@ -125,7 +124,7 @@ public class BlendingCache {
             }
         }
 
-        invalidatedHashedChunks.remove(chunk.invalidationKey);
+        chunk.removeFromLinkedList();
     }
     public BlendingChunk getOrInitializeChunk(Coordinates coordinates, int biomeColorType) {
         return getOrInitializeChunk(coordinates.x(), coordinates.y(), coordinates.z(), biomeColorType);

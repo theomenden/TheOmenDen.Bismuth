@@ -1,10 +1,11 @@
 package com.theomenden.bismuth.caching.strategies;
 
-import com.theomenden.bismuth.caching.caches.ColorBlendingCache;
 import com.theomenden.bismuth.utils.ColorCachingUtils;
+import lombok.Getter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Getter
 public abstract class BaseSlice {
     private long key;
     private int size;
@@ -28,18 +29,6 @@ public abstract class BaseSlice {
 
     public final int getSize() {
         return size;
-    }
-
-    public final int getSalt() {
-        return salt;
-    }
-
-    public final int getAge() {
-        return age;
-    }
-
-    public final void setAge(int age) {
-        this.age = age;
     }
 
     public final void setCacheKey(long key) {

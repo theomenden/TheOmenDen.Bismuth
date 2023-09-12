@@ -1,8 +1,8 @@
 package com.theomenden.bismuth.caching.strategies;
 
 import com.theomenden.bismuth.blending.BlendingConfig;
-import com.theomenden.bismuth.caching.caches.ColorBlendingCache;
 import com.theomenden.bismuth.models.records.Coordinates;
+import com.theomenden.bismuth.utils.ColorCachingUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 
 import java.util.concurrent.locks.StampedLock;
@@ -19,15 +19,12 @@ public abstract class SliceCacheStrategy<T extends BaseSlice> {
         this.totalSlices = count;
         int countPerBucket = count / AVAILABLE_BUCKETS;
         hashMapStorageContainer = new Long2ObjectLinkedOpenHashMap[AVAILABLE_BUCKETS];
-
-        IntStream
-                .range(0, AVAILABLE_BUCKETS)
-                .forEach(i -> hashMapStorageContainer[i] = new Long2ObjectLinkedOpenHashMap<>(countPerBucket));
-
         locks = new StampedLock[AVAILABLE_BUCKETS];
-        IntStream
-                .range(0, AVAILABLE_BUCKETS)
-                .forEach(i -> locks[i] = new StampedLock());
+
+        for(int i = 0; i < AVAILABLE_BUCKETS; ++i) {
+            hashMapStorageContainer[i] = new Long2ObjectLinkedOpenHashMap<>(countPerBucket);
+            locks[i] = new StampedLock();
+        }
     }
 
     public abstract T createSlice(int sliceSize, int salt);
@@ -37,21 +34,20 @@ public abstract class SliceCacheStrategy<T extends BaseSlice> {
 
         int countPerBucket = this.totalSlices / AVAILABLE_BUCKETS;
 
-        IntStream
-                .range(0, AVAILABLE_BUCKETS)
-                .forEach(i -> {
-                    StampedLock stampedLock = locks[i];
-                    Long2ObjectLinkedOpenHashMap<T> hash = hashMapStorageContainer[i];
-                    long stamp = stampedLock.writeLock();
-                    hash.clear();
-                    IntStream
-                            .range(0, countPerBucket)
-                            .forEach(index -> {
-                                T slice = createSlice(sliceSize, index);
-                                hash.put(slice.getCacheKey(), slice);
-                            });
-                    stampedLock.unlockWrite(stamp);
-                });
+        for(int index = 0; index < AVAILABLE_BUCKETS; ++index) {
+            var lock = locks[index];
+            var hash = hashMapStorageContainer[index];
+
+            var lockStamp = lock.writeLock();
+            hash.clear();
+
+            for (var i = 0; i < countPerBucket; ++i) {
+                var slice = createSlice(sliceSize, i);
+                hash.put(slice.getKey(), slice);
+            }
+
+            lock.unlockWrite(lockStamp);
+        }
     }
 
     public final void invalidateAllCachesInRadius(int blendedRadius){
@@ -71,7 +67,7 @@ public abstract class SliceCacheStrategy<T extends BaseSlice> {
         return getOrInitSlice(sliceSize, sliceCoordinates, colorType, shouldTryLocking);
     }
     public final T getOrInitSlice(int sliceSize, Coordinates sliceCoordinates, int colorType, boolean shouldTryLocking){
-        long key = ColorBlendingCache.getChunkCacheKey(sliceCoordinates, colorType);
+        long key = ColorCachingUtils.getChunkKey(sliceCoordinates, colorType);
 
         int bucketIndex = getBucketIndex(sliceCoordinates);
 

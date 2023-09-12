@@ -32,8 +32,8 @@ public abstract class SpawnEggItemMixin extends Item {
         }
 
         var colorProperties = ObjectUtils.firstNonNull(
-                BismuthColormaticResolution.COLOR_PROPERTIES,
-                BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES
+                BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                BismuthColormaticResolution.COLOR_PROPERTIES
         );
 
         int color = colorProperties

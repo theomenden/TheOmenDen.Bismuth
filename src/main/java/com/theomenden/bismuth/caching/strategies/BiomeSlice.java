@@ -9,7 +9,8 @@ public final class BiomeSlice extends BaseSlice {
 
     public BiomeSlice(int size, int salt) {
         super(size, salt);
-        this.data = new Biome[(int)Math.pow(size, 3)];
+        final int cubedSize = size * size * size;
+        this.data = new Biome[cubedSize];
     }
 
     public void invalidateCacheData() {

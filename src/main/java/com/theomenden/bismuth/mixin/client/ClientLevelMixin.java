@@ -51,8 +51,6 @@ public abstract class ClientLevelMixin extends Level {
     @Shadow
     private final Object2ObjectArrayMap<ColorResolver, BlockTintCache> tintCaches = new Object2ObjectArrayMap<>();
 
-    @Shadow public abstract int calculateBlockTint(BlockPos blockPos, ColorResolver colorResolver);
-
     protected ClientLevelMixin(WritableLevelData levelData, ResourceKey<Level> dimension, RegistryAccess registryAccess, Holder<DimensionType> dimensionTypeRegistration, Supplier<ProfilerFiller> profiler, boolean isClientSide, boolean isDebug, long biomeZoomSeed, int maxChainedNeighborUpdates) {
         super(levelData, dimension, registryAccess, dimensionTypeRegistration, profiler, isClientSide, isDebug, biomeZoomSeed, maxChainedNeighborUpdates);
     }
@@ -76,18 +74,6 @@ public abstract class ClientLevelMixin extends Level {
 
         bismuth$blendingColorCache.invalidateChunk(chunkX, chunkZ);
     }
-
-    /*
-    @Inject(
-            method = "getBlockTint",
-            at = @At("HEAD")
-    )
-    private void onGetBlockTint(BlockPos blockPos, ColorResolver colorResolver, CallbackInfoReturnable<Integer> cir) {
-        if(this.tintCaches.get(colorResolver) == null) {
-            this.tintCaches.put(colorResolver, new BlockTintCache(pos1 -> this.calculateBlockTint(pos1, colorResolver)));
-        }
-    }
-    */
 
     /**
      * @author

@@ -17,8 +17,12 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.FogType;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.compress.harmony.pack200.NewAttributeBands;
 import org.apache.commons.lang3.ObjectUtils;
+import org.joml.Vector3f;
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,14 +35,9 @@ public abstract class BackgroundRendererMixin {
     @Shadow private static float fogRed;
     @Shadow private static float fogGreen;
     @Shadow private static float fogBlue;
-    @Unique
-    private static float redStore;
-
-    @Unique
-    private static float greenStore;
-
-    @Unique
-    private static float blueStore;
+    @Unique private static float redStore;
+    @Unique private static float greenStore;
+    @Unique private static float blueStore;
 
     @ModifyVariable(
             method = "setupColor",
@@ -103,6 +102,7 @@ public abstract class BackgroundRendererMixin {
         return color;
     }
 
+    @Dynamic("Cubic Sampler method in #setupColor")
     @Redirect(
             method="method_24873",
             at = @At(
@@ -124,6 +124,32 @@ public abstract class BackgroundRendererMixin {
                 QuartPos.toBlock(z)
         );
         return resolver.getColorAtCoordinatesForBiome(level.registryAccess(), self, coordinates);
+    }
+
+    @Inject(
+            method = "setupColor",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/renderer/FogRenderer;fogBlue:F",
+                    opcode = Opcodes.PUTSTATIC,
+                    ordinal = 0,
+                    shift = At.Shift.AFTER
+            ),
+            slice = @Slice(
+                    from = @At(
+                            value = "INVOKE",
+                            target = "Lnet/minecraft/client/Camera;getLookVector()Lorg/joml/Vector3f;"
+                    )
+            )
+    )
+    private static void blendFogAndSkyColors(Camera activeRenderInfo, float partialTicks, ClientLevel level, int renderDistanceChunks, float bossColorModifier, CallbackInfo ci) {
+        if(Bismuth.configuration.shouldClearSky
+        && level.dimensionType().hasSkyLight()) {
+            Vec3 color = level.getSkyColor(activeRenderInfo.getPosition(), partialTicks);
+            BackgroundRendererMixin.fogRed  = (float)color.x() ;
+            BackgroundRendererMixin.fogBlue  = (float)color.y();
+            BackgroundRendererMixin.fogGreen  = (float)color.z();
+        }
     }
 
     @Inject(

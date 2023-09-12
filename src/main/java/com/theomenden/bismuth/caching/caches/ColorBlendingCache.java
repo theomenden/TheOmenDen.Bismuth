@@ -7,7 +7,7 @@ public final class ColorBlendingCache {
     public static final int INVALID_CHUNK_KEY = -1;
 
     public static int getArrayIndex(int dimension, Coordinates coordinates) {
-        return coordinates.x() + coordinates.y() * dimension + coordinates.z() * (int)Math.pow(dimension, 2);
+        return coordinates.x() +  dimension *(coordinates.y() + coordinates.z() * dimension);
     }
 
     public static int getArrayIndex(int dimension, int x, int y, int z) {

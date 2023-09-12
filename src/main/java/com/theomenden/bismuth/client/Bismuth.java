@@ -44,8 +44,7 @@ public class Bismuth implements ClientModInitializer {
             14,
             (integer) -> Minecraft.getInstance().levelRenderer.allChanged());
 
-    public static int
-    getBiomeBlendRadius()
+    public static int getBiomeBlendRadius()
     {
         return bismuthBlendingRadius.get();
     }

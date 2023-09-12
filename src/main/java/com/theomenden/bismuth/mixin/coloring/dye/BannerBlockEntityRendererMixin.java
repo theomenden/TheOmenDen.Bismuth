@@ -19,8 +19,8 @@ public abstract class BannerBlockEntityRendererMixin {
     )
     private static float[] proxyColorComponents(DyeColor instance) {
         var colorProperties = ObjectUtils.firstNonNull(
-                BismuthColormaticResolution.COLOR_PROPERTIES,
-                BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES
+                BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                BismuthColormaticResolution.COLOR_PROPERTIES
         );
 
         float[] color = colorProperties.getProperties().getBannerRgb(instance);

@@ -28,6 +28,8 @@ jobs:
           modrinth-id: nl0Cdq9L
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           modrinth-featured: true
+          curseforge-id: 912202
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
   qodana:
     runs-on: ubuntu-latest
     steps:

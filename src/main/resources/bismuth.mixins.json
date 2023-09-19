@@ -12,6 +12,7 @@
     "client.ResourceLocationMixin",
     "client.ChatStyleMixin",
     "client.VideoSettingsScreenMixin",
+    "client.ClickableWidgetMixin",
     "coloring.dye.DyeColorMixin",
     "coloring.dye.SheepEntityMixin",
     "coloring.TextureManagerMixin",

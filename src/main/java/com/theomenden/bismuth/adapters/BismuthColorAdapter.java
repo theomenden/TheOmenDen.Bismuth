@@ -13,11 +13,11 @@ import java.io.IOException;
 
 public class BismuthColorAdapter extends TypeAdapter<BismuthColor> {
     @Override
-    public void write(JsonWriter jsonWriter, BismuthColor vanadiumColor) throws IOException {
-        if(vanadiumColor == null) {
+    public void write(JsonWriter jsonWriter, BismuthColor bismuthColor) throws IOException {
+        if(bismuthColor == null) {
             jsonWriter.nullValue();
         } else {
-            String hexValue = ColorConverter.rgbToHex(vanadiumColor.rgb());
+            String hexValue = ColorConverter.rgbToHex(bismuthColor.rgb());
             jsonWriter.value(hexValue);
         }
     }

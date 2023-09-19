@@ -269,13 +269,13 @@ public class GlobalColorProperties {
                     });
         }
 
-        settings.spawnEgg.forEach((key, vanadiumColors) -> {
+        settings.spawnEgg.forEach((key, bismuthColors) -> {
             EntityType<?> type = entityTypeRegistry.get(ResourceLocation.tryParse(key));
             int[] colors = result.computeIfAbsent(type, t -> new int[2]);
 
             IntStream
-                    .range(0, Math.min(2, vanadiumColors.length))
-                    .forEach(i -> colors[i] = vanadiumColors[i]
+                    .range(0, Math.min(2, bismuthColors.length))
+                    .forEach(i -> colors[i] = bismuthColors[i]
                             .rgb());
         });
 

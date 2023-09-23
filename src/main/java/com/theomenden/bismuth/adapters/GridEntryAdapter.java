@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GridEntryAdapter  extends TypeAdapter<GridEntry> {
+public class GridEntryAdapter extends TypeAdapter<GridEntry> {
     private final ResourceLocationAdapter identifierAdapter = new ResourceLocationAdapter();
     @Override
     public void write(JsonWriter jsonWriter, GridEntry gridEntry) {

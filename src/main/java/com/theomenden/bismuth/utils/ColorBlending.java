@@ -64,8 +64,6 @@ public class ColorBlending {
             result = scaledSliceSize - scaledLowerBlendRadius;
         }
 
-
-
         return result;
     }
 
@@ -855,7 +853,7 @@ public class ColorBlending {
             Coordinates coordinates) {
 
         DebugEvent debugEvent = DebugUtils.putColorEvent(coordinates, colorType);
-        final int blendRadius = Bismuth.configuration.blendingRadius.getValue();
+        final int blendRadius = Bismuth.getBiomeBlendRadius();
 
         if (Range.between(BlendingConfig.BIOME_MINIMUM_BLENDING_RADIUS + 1, BlendingConfig.BIOME_MAXIMUM_BLENDING_RADIUS)
                  .contains(blendRadius)) {

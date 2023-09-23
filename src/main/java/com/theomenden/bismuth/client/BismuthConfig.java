@@ -1,5 +1,6 @@
 package com.theomenden.bismuth.client;
 
+import com.theomenden.bismuth.models.enums.BiomeBlendNames;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
@@ -25,8 +26,8 @@ public class BismuthConfig implements ConfigData {
 
     @ConfigEntry.Category("biomeBlendRadius")
     @ConfigEntry.Gui.Tooltip
-    @ConfigEntry.BoundedDiscrete(min=0, max = 14)
-    public int blendingRadius = 14;
+    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+    public BiomeBlendNames blendingRadius = BiomeBlendNames.BROBDINGNAGIAN;
 
     public static double calculateScale(double relativeBlockLightIntensity) {
         final double QUARTER_LOG_2 = 0.25 * Math.log(2);

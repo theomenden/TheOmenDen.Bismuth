@@ -60,7 +60,7 @@ public abstract class ClientLevelMixin extends Level {
         this.tintCaches.entrySet().removeIf(entry -> entry.getKey() instanceof BismuthExtendedColorResolver);
 
         bismuth$blendingColorCache.invalidateAllChunks();
-        int blendingRadius = Bismuth.configuration.blendingRadius;
+        int blendingRadius = Bismuth.configuration.blendingRadius.getValue();
         bismuth$chunkColorCache.invalidateAllCachesInRadius(blendingRadius);
     }
 

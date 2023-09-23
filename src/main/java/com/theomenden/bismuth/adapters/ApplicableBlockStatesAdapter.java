@@ -51,8 +51,7 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
                     && parts[1].indexOf('=') < 0) {
                 ResourceLocation id = new ResourceLocation(parts[0], parts[1]);
 
-                if(parts[0].equals(Bismuth.MODID)
-                        || parts[0].equals(Bismuth.COLORMATIC_ID)) {
+                if(MODIDS.contains(parts[0])) {
                     initializeSpecialBlockStates(applicableBlockStates, id, parts);
                     return applicableBlockStates;
                 } else {

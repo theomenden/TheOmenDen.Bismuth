@@ -54,7 +54,7 @@ dependencies {
     modApi ("com.terraformersmc:modmenu:${project.modmenu_version}") {
         exclude(group: 'net.fabricmc.fabric.fabric-api')
     }
-    modCompileOnly modRuntimeOnly("maven.modrinth:indium:${project.indium_version}")
+    modCompileOnly modRuntimeOnly("maven.modrinth:indium:${project.indium_version}+mc1.19.4")
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2';
     runtimeOnly "org.joml:joml:1.10.2"
 }

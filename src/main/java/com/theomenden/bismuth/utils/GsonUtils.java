@@ -110,7 +110,7 @@ public final class GsonUtils {
     private static String toJsonString(Properties properties, Function<String, String> keyMappingFunction, Predicate<String> arrayValue) {
         Map<String, Object> propertyMap = Maps.newHashMap();
         for (String property: properties.stringPropertyNames()) {
-            String[] keys = property.split("\\:");
+            String[] keys = property.split(":");
             Map<String, Object> nestedProperties = propertyMap;
             int i;
             int length = keys.length - 1;

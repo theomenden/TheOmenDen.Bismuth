@@ -5,6 +5,7 @@ import com.theomenden.bismuth.models.records.Coordinates;
 import com.theomenden.bismuth.utils.ColorCachingUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 
+import java.lang.reflect.Array;
 import java.util.concurrent.locks.StampedLock;
 import java.util.stream.IntStream;
 

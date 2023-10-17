@@ -30,6 +30,9 @@ jobs:
           modrinth-featured: true
           curseforge-id: 912202
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          github-tag: mc1.19.4-0.1.8
+          github-generate-changelog: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
   qodana:
     runs-on: ubuntu-latest
     steps:

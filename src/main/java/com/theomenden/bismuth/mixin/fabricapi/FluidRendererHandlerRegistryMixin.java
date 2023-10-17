@@ -10,9 +10,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(value = FluidRenderHandlerRegistryImpl.class, remap = false)
 public abstract class FluidRendererHandlerRegistryMixin {
     @ModifyVariable(
-            method="register"
-    , at=@At("HEAD"),
-    ordinal = 0, argsOnly = true)
+            method="register",
+            at=@At("HEAD"),
+            ordinal = 0)
     private FluidRenderHandler onFluidRenderingRegistration(FluidRenderHandler delegate) {
         return new BismuthFluidRenderHandler(delegate);
     }

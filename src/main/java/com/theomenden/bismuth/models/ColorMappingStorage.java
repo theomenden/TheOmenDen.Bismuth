@@ -15,6 +15,7 @@ import org.intellij.lang.annotations.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,9 +28,9 @@ public class ColorMappingStorage<T> {
 
     public ColorMappingStorage(BismuthResolverProvider<T> defaultResolverProvider) {
         this.colorMappings = HashBasedTable.create();
-        this.fallbackColorMappings = Maps.newHashMap();
-        this.resolvers = Maps.newHashMap();
-        this.defaultResolvers = Maps.newHashMap();
+        this.fallbackColorMappings = new HashMap<>();
+        this.resolvers = new HashMap<>();
+        this.defaultResolvers = new HashMap<>();
         this.defaultResolverProvider = defaultResolverProvider;
     }
 

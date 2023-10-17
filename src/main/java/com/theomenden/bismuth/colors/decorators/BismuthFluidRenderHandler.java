@@ -12,7 +12,6 @@ import net.minecraft.world.level.material.FluidState;
 import org.jetbrains.annotations.Nullable;
 
 public class BismuthFluidRenderHandler implements FluidRenderHandler {
-
     private final FluidRenderHandler delegate;
 
     public BismuthFluidRenderHandler(FluidRenderHandler delegate) {

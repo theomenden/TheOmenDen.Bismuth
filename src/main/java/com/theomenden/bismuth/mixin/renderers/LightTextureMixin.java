@@ -19,9 +19,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LightTexture.class)
@@ -59,7 +57,7 @@ public abstract class LightTextureMixin {
 
     @Inject(
             method = "tick",
-            at=@At("RETURN")
+            at=@At("TAIL")
     )
     private void onTickFlicker(CallbackInfo ci) {
         if(Bismuth.configuration.shouldFlickerBlockLight) {
@@ -78,7 +76,7 @@ public abstract class LightTextureMixin {
     }
 
     @Inject(
-            method = "updateLightTexture",
+            method = "updateLightTexture(F)V",
             at = @At(
                     value = "JUMP",
                     ordinal = 1,
@@ -167,21 +165,18 @@ public abstract class LightTextureMixin {
         }
     }
 
-    @ModifyVariable(
-            method = "updateLightTexture",
-            at = @At("STORE"),
-            ordinal = 2
-    )
-    private float modifySkyDarkness(float ambience) {
+    @ModifyConstant(method = "updateLightTexture(F)V",
+    constant = @Constant(floatValue = 1.0f, ordinal = 0))
+    private float modifySkyDarkness(float original) {
         if(!Bismuth.configuration.shouldBlendSkyLight) {
-            ambience = (int)(ambience * 16) * MathUtils.INV_16F;
+            original = (int)(original * 16) * MathUtils.INV_16F;
         }
-        return ambience;
+        return original;
     }
 
 
     @ModifyVariable(
-            method = "updateLightTexture",
+            method = "updateLightTexture(F)V",
             at = @At("STORE"),
             index = 16    )
     private float modifyFlickerIntensity(float blockLight) {

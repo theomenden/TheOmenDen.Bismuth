@@ -1,9 +1,10 @@
-package com.theomenden.bismuth.models;
+package com.theomenden.bismuth.colors.properties;
 
-import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
 import com.theomenden.bismuth.client.Bismuth;
 import com.theomenden.bismuth.defaults.DefaultColumns;
+import com.theomenden.bismuth.models.ApplicableBlockStates;
+import com.theomenden.bismuth.models.GridEntry;
 import com.theomenden.bismuth.models.enums.ColumnLayout;
 import com.theomenden.bismuth.models.enums.Format;
 import com.theomenden.bismuth.models.records.BismuthColor;
@@ -13,21 +14,20 @@ import com.theomenden.bismuth.utils.BismuthColormaticResolution;
 import com.theomenden.bismuth.utils.GsonUtils;
 import lombok.Getter;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,27 +82,29 @@ public class ColorMappingProperties {
                 }
                 ColumnBounds bounds = new ColumnBounds(nextColumn, entry.width);
                 nextColumn += entry.width;
-                entry.biomes
-                        .stream()
-                        .map(biomeId -> BiomeTracingUtils.updateBiomeName(biomeId, this.id))
-                        .filter(Objects::nonNull)
-                        .forEach(updated -> columnsByBiome.put(updated, bounds));
+
+                for(var biomeResourceLocation : entry.biomes) {
+                    var updatedResource = BiomeTracingUtils.updateBiomeName(biomeResourceLocation, this.id);
+                    if(updatedResource != null) {
+                        columnsByBiome.put(updatedResource, bounds);
+                    }
+                }
             }
         } else if (settings.biomes != null) {
             this.columnsByBiome = new HashMap<>();
-            settings.biomes
-                    .forEach((key, value) -> {
-                        ResourceLocation updated = BiomeTracingUtils.updateBiomeName(key, this.id);
-                        if (updated != null) {
-                            columnsByBiome.put(updated, new ColumnBounds(value, 1));
-                        }
-                    });
+
+            for(Map.Entry<ResourceLocation, Integer> entry: settings.biomes.entrySet()) {
+                var updated = BiomeTracingUtils.updateBiomeName(entry.getKey(), this.id);
+                if(updated != null) {
+                    columnsByBiome.put(updated, new ColumnBounds(entry.getValue(), 1));
+                }
+            }
         } else {
             this.columnsByBiome = null;
         }
     }
-    
-    public ColumnBounds getColumn(ResourceKey<Biome> biomeKey, ResourceKey<Registry<Biome>> biomeRegistry) {
+
+    public ColumnBounds getColumn(ResourceKey<Biome> biomeKey, Registry<Biome> biomeRegistry) {
         if(format == Format.GRID) {
             if(biomeKey != null) {
                 ResourceLocation id = biomeKey.location();
@@ -130,29 +132,31 @@ public class ColorMappingProperties {
     }
 
     public Set<ResourceLocation> getApplicableBiomes() {
-        Set<ResourceLocation> result;
-        if (columnsByBiome == null || columnsByBiome.isEmpty()) {
-            result = Sets.newHashSet();
-        } else {
+        Set<ResourceLocation> result = new HashSet<>();
+        if (columnsByBiome != null) {
             result = new HashSet<>(columnsByBiome.keySet());
         }
         return result;
     }
 
     public Set<Block> getApplicableBlocks() {
-        return blocks
-                .stream()
-                .filter(a -> a.specialKey == null && a.states.isEmpty())
-                .map(a -> a.block)
-                .collect(Collectors.toSet());
+        Set<Block> result = new HashSet<>();
+        for(ApplicableBlockStates applicableBlockState: blocks) {
+            if(applicableBlockState.specialKey == null && applicableBlockState.states.isEmpty()) {
+                result.add(applicableBlockState.block);
+            }
+        }
+        return result;
     }
 
     public Set<BlockState> getApplicableBlockStates() {
-        return blocks
-                .stream()
-                .filter(a -> a.specialKey == null)
-                .flatMap(a -> a.states.stream())
-                .collect(Collectors.toSet());
+        Set<BlockState> result = new HashSet<>();
+        for(ApplicableBlockStates blockStates: blocks) {
+            if(blockStates.specialKey == null) {
+                result.addAll(blockStates.states);
+            }
+        }
+        return result;
     }
 
     public Map<ResourceLocation, Collection<ResourceLocation>> getApplicableSpecialIds() {
@@ -187,6 +191,8 @@ public class ColorMappingProperties {
 
     private static ColorMappingProperties loadFromJson(Reader json, ResourceLocation id, boolean custom) {
         Settings settings;
+
+
         try {
             settings = GsonUtils.PROPERTY_GSON.fromJson(json, Settings.class);
             if (settings == null) {
@@ -197,13 +203,18 @@ public class ColorMappingProperties {
             LOGGER.error("Error loading {}: {}", id, e.getMessage());
             settings = new Settings();
         }
+
+        var colorProperties = ObjectUtils.firstNonNull(
+                BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                BismuthColormaticResolution.COLOR_PROPERTIES
+        );
         if (settings.format == null) {
-            settings.format = BismuthColormaticResolution.COLOR_PROPERTIES
+            settings.format = colorProperties
                     .getProperties()
                     .getDefaultFormat();
         }
         if (settings.layout == null) {
-            settings.layout = BismuthColormaticResolution.COLOR_PROPERTIES
+            settings.layout = colorProperties
                     .getProperties()
                     .getDefaultColumnLayout();
         }
@@ -229,7 +240,6 @@ public class ColorMappingProperties {
         }
         if (settings.source == null) {
             settings.source = makeSourceFromFileName(id);
-            LOGGER.info("{}: file", settings.source);
         }
         settings.source = GsonUtils.resolveRelativeResourceLocation(settings.source, id);
         return new ColorMappingProperties(id, settings);

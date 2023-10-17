@@ -19,9 +19,9 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.material.MaterialColor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 public class GlobalColorProperties {
-    private static final Logger LOGGER = LogManager.getLogger(Bismuth.MODID);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bismuth.class);
 
     private static final Map<String, String> keyRemap = Map.ofEntries(
             Map.entry("nether", "the_nether"),
@@ -216,13 +216,15 @@ public class GlobalColorProperties {
 
     private Map<ResourceLocation, BismuthColor> convertIdentifierMapping(Map<String, BismuthColor> map) {
         Map<ResourceLocation, BismuthColor> result = new HashMap<>();
+
         map
                 .forEach((key, value) -> {
-                    ResourceLocation id = ResourceLocation.tryParse(key);
-                    if (id != null) {
-                        result.put(id, value);
+                    var resourceLocation = ResourceLocation.tryParse(key);
+                    if (resourceLocation != null) {
+                        result.put(resourceLocation, value);
                     }
                 });
+
         return result;
     }
 

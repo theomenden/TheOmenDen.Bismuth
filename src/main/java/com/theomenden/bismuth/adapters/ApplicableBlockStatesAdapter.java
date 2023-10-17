@@ -16,7 +16,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.predicate.BlockStatePredicate;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -24,7 +25,7 @@ import java.util.stream.IntStream;
 
 public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockStates> {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bismuth.class);
     private static final Set<String> MODIDS = Set.of(Bismuth.MODID, Bismuth.COLORMATIC_ID);
 
     @Override
@@ -91,9 +92,9 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
             String[] propertyValues = parts[i].substring(splitIndex + 1).split(",");
             List<Comparable<?>> container = new ArrayList<>();
 
-            Arrays
-                    .stream(propertyValues)
-                    .forEach(s -> putPropertyValue(container, propertyState, s));
+            for(String val : propertyValues) {
+                putPropertyValue(container, propertyState, val);
+            }
 
             predicate = predicate.where(propertyState, container::contains);
         }
@@ -119,31 +120,28 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
     private static void initializeSpecialBlockStates(ApplicableBlockStates states, ResourceLocation identifier, String[] parts) {
         states.specialKey = identifier;
 
-        if(parts.length != 3) {
+        if (parts.length != 3) {
             LOGGER.warn("Special identifier does not specify a sole property: {}", Arrays.toString(parts));
-        } else{
-            IntStream
-                    .range(2, parts.length)
-                    .forEach(i -> {
-                        int split = parts[i].indexOf('=');
-                        if (split < 0) {
-                            throw new JsonSyntaxException("Invalid property syntax: " + parts[i]);
-                        }
-                        String[] propertyValues = parts[i]
-                                .substring(split + 1)
-                                .split(",");
-                        Arrays
-                                .stream(propertyValues)
-                                .forEach(propertyValue -> {
-                                    ResourceLocation value = ResourceLocation.tryParse(propertyValue.replaceFirst("/", ":"));
+        } else {
+            for (int i = 2; i < parts.length; i++) {
+                int split = parts[i].indexOf('=');
+                if (split < 0) {
+                    throw new JsonSyntaxException("Invalid property syntax: " + parts[i]);
+                }
+                String[] propertyValues = parts[i]
+                        .substring(split + 1)
+                        .split(",");
 
-                                    if (value == null) {
-                                        throw new JsonSyntaxException("Invalid identifier value: " + propertyValue);
-                                    }
+                for (String value : propertyValues) {
+                    ResourceLocation location = ResourceLocation.tryParse(value.replaceFirst("/", ":"));
 
-                                    states.specialLocations.add(value);
-                                });
-                    });
+                    if (location == null) {
+                        throw new JsonSyntaxException("Invalid identifier value: " + location);
+                    }
+
+                    states.specialLocations.add(location);
+                }
+            }
         }
     }
 

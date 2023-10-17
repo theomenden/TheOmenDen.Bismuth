@@ -1,7 +1,6 @@
 package com.theomenden.bismuth.models.debug;
 
 import com.theomenden.bismuth.models.enums.InternalEventType;
-import com.theomenden.bismuth.models.records.BiomeColorTypes;
 import com.theomenden.bismuth.models.records.Coordinates;
 import lombok.*;
 

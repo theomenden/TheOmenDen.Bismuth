@@ -5,9 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.theomenden.bismuth.adapters.*;
-import com.theomenden.bismuth.client.Bismuth;
+import com.theomenden.bismuth.colors.properties.ColorMappingProperties;
 import com.theomenden.bismuth.models.ApplicableBlockStates;
-import com.theomenden.bismuth.models.ColorMappingProperties;
 import com.theomenden.bismuth.models.GridEntry;
 import com.theomenden.bismuth.models.enums.Format;
 import com.theomenden.bismuth.models.exceptions.InvalidColorMappingException;
@@ -17,8 +16,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.material.MaterialColor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.nio.ByteOrder;
@@ -30,7 +27,6 @@ import java.util.function.Predicate;
 
 public final class GsonUtils {
     private GsonUtils(){}
-    private static final Logger logger = LogManager.getLogger(Bismuth.MODID);
     public static final Gson PROPERTY_GSON = new GsonBuilder()
             .registerTypeAdapterFactory(new StringIdentifiableTypeAdapterFactory())
             .registerTypeAdapter(ResourceLocation.class, new ResourceLocationAdapter())
@@ -107,10 +103,11 @@ public final class GsonUtils {
         return pixel;
     }
 
+    @SuppressWarnings("unchecked")
     private static String toJsonString(Properties properties, Function<String, String> keyMappingFunction, Predicate<String> arrayValue) {
         Map<String, Object> propertyMap = Maps.newHashMap();
         for (String property: properties.stringPropertyNames()) {
-            String[] keys = property.split(":");
+            String[] keys = property.split("\\.");
             Map<String, Object> nestedProperties = propertyMap;
             int i;
             int length = keys.length - 1;
@@ -120,12 +117,12 @@ public final class GsonUtils {
 
                 if(temp instanceof Map<?,?>) {
                     nestedProperties = (Map<String,Object>)temp;
-                    continue;
+                } else {
+                    Map<String, Object> newNestedMap = new HashMap<>();
+                    newNestedMap.put("", temp);
+                    nestedProperties.put(key, newNestedMap);
+                    nestedProperties = newNestedMap;
                 }
-                Map<String, Object> newNestedMap = new HashMap<>();
-                newNestedMap.put("", temp);
-                nestedProperties.put(key, newNestedMap);
-                nestedProperties = newNestedMap;
             }
             String key = keyMappingFunction.apply(keys[i]);
             String propertyValue = properties.getProperty(property);

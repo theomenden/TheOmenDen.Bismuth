@@ -2,8 +2,8 @@ package com.theomenden.bismuth.colors.mapping;
 
 import com.google.common.collect.Sets;
 import com.theomenden.bismuth.colors.interfaces.BismuthResolver;
+import com.theomenden.bismuth.colors.properties.ColorMappingProperties;
 import com.theomenden.bismuth.defaults.DefaultBismuthResolverProviders;
-import com.theomenden.bismuth.models.ColorMappingProperties;
 import com.theomenden.bismuth.models.ColorMappingStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;

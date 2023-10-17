@@ -36,23 +36,17 @@ public abstract class ModelBakeryMixin {
             )
     );
 
-    @Dynamic("Lambda in #bake")
     @Inject(
-            method = "method_45877",
-            at= @At(value ="INVOKE", target = "Lnet/minecraft/client/resources/model/ModelBakery$ModelBakerImpl;bake(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/resources/model/BakedModel;")
+            method = "loadModel",
+            at= @At(value ="HEAD")
     )
-    private void setModelIdContext(BiFunction biFunction, ResourceLocation resourceLocation, CallbackInfo ci) {
-        boolean finished = false;
+    private void setModelIdContext(ResourceLocation blockstateLocation, CallbackInfo ci) {
         ModelIdContext.shouldTintCurrentModel = false;
-        if (resourceLocation instanceof ModelResourceLocation modelId) {
-            BlockState blockState = null;
-            if (modelId
-                    .getVariant()
-                    .equals("inventory")) {
+        if (blockstateLocation instanceof ModelResourceLocation modelId) {
+            BlockState blockState;
+            if (modelId.getVariant().equals("inventory")) {
                 var blockId = new ResourceLocation(modelId.getNamespace(), modelId.getPath());
-                blockState = BuiltInRegistries.BLOCK
-                        .get(blockId)
-                        .defaultBlockState();
+                blockState = BuiltInRegistries.BLOCK.get(blockId).defaultBlockState();
             } else {
                 var blockStateDesc = modelId.getNamespace() + ":" + modelId.getPath() + "[" + modelId.getVariant() + "]";
                 try {
@@ -60,19 +54,18 @@ public abstract class ModelBakeryMixin {
                             .parse(new StringReader(blockStateDesc))
                             .getState();
                 } catch (CommandSyntaxException e) {
-                    finished = true;
+                    return;
                 }
             }
-            if (!finished) {
-                if (BiomeColorMappings.isCustomColored(blockState)) {
-                    var colorProviders = ((BlockColorsAccessor) Minecraft
+
+            if (BiomeColorMappings.isCustomColored(blockState)) {
+                var colorProviders = ((BlockColorsAccessor) Minecraft
                             .getInstance()
                             .getBlockColors()).getBlockColors();
-                    if (!colorProviders.contains(BuiltInRegistries.BLOCK.getId(blockState.getBlock()))) {
-                        ModelIdContext.shouldTintCurrentModel = true;
-                    }
-                }
-            }
+                if (!colorProviders.contains(BuiltInRegistries.BLOCK.getId(blockState.getBlock()))) {
+                    ModelIdContext.shouldTintCurrentModel = true;
+               }
+           }
         }
     }
 }

@@ -7,8 +7,7 @@
     "SodiumBlockColorsMixin",
     "SodiumItemColorsMixin",
     "SodiumBiomeManagerAccessor",
-    "SodiumClientLevelMixin",
-    "SodiumGameOptionsPageMixin"
+    "SodiumClientLevelMixin"
   ],
   "mixins": [
 

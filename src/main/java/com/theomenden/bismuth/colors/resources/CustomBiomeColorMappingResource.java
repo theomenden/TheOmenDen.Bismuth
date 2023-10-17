@@ -9,16 +9,16 @@ import com.theomenden.bismuth.utils.GsonUtils;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.regex.Pattern;
 
 public class CustomBiomeColorMappingResource implements SimpleSynchronousResourceReloadListener {
-    private static final Logger LOGGER = LogManager.getLogger(Bismuth.MODID);
-    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("^[a-zAZ0-9_/.-]+");
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bismuth.class);
+    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[a-z0-9_/.-]+");
     private final ResourceLocation identifier;
     private final ResourceLocation optifineIdentifier;
     private final ResourceLocation colormaticIdentifier;
@@ -58,7 +58,7 @@ public class CustomBiomeColorMappingResource implements SimpleSynchronousResourc
             if (!IDENTIFIER_PATTERN
                     .matcher(id.getPath())
                     .matches()) {
-                LOGGER.error("Colormapping definition file '{}' does not name a valid resource location. Please have the resource pack author fix this.", id);
+                LOGGER.error("ColorMapping definition file '{}' does not name a valid resource location. Please have the resource pack author fix this.", id);
             }
             try {
                 PropertyImage pi = GsonUtils.loadColorMapping(manager, id, true);
@@ -71,7 +71,7 @@ public class CustomBiomeColorMappingResource implements SimpleSynchronousResourc
     }
 
     @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {
+    public void onResourceManagerReload(@NotNull ResourceManager resourceManager) {
         BiomeColorMappings.resetColorMappings();
         addColorMappings(resourceManager, otherOptifineIdentifier, false);
         addColorMappings(resourceManager, optifineIdentifier, false);

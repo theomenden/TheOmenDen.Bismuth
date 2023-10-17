@@ -24,7 +24,7 @@ public record LightMappingProperties() {
         try(Reader reader = new InputStreamReader(manager.getResourceOrThrow(identifier).open())) {
             settings = GsonUtils.PROPERTY_GSON.fromJson(reader, LightmapSettings.class);
         }catch(JsonParseException e) {
-            LOGGER.error("Failed to load lightmapping settings for {}: {}", identifier, e.getMessage());
+            LOGGER.error("Failed to parse lightmapping settings for {}: {}", identifier, e.getMessage());
             settings = new LightmapSettings();
         } catch (IOException e) {
             settings = new LightmapSettings();

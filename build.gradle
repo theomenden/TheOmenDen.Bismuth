@@ -1,11 +1,11 @@
 plugins {
     id 'java-library'
-    id 'fabric-loom' version '1.4.3'
+    id 'fabric-loom' version '1.4.+'
     id 'idea'
     id 'maven-publish'
     id 'com.modrinth.minotaur' version '2.+'
-    id 'io.freefair.lombok' version '8.4'
-    id "com.github.johnrengelman.shadow" version '8.1.1'
+    id 'io.freefair.lombok' version '8.+'
+    id "com.github.johnrengelman.shadow" version '8.1.+'
 }
 
 version = project.mod_version

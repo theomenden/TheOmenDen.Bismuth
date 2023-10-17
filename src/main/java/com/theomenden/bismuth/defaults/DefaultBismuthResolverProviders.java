@@ -51,14 +51,14 @@ public final class DefaultBismuthResolverProviders {
         if(BismuthColormaticResolution.hasCustomFogColors()
                 && key.equals(Bismuth.OVERWORLD)) {
             var skyColors = ObjectUtils.firstNonNull(
-                    BismuthColormaticResolution.SKY_COLORS,
-                    BismuthColormaticResolution.COLORMATIC_SKY_COLORS
+                    BismuthColormaticResolution.COLORMATIC_SKY_COLORS,
+                    BismuthColormaticResolution.SKY_COLORS
             );
-            color = 0xff000000 | skyColors.getColorMapping().getColorAtCoordinatesForBiome(manager, biome, coordinates);
+            color = skyColors.getColorMapping().getColorAtCoordinatesForBiome(manager, biome, coordinates);
         } else {
             var colorProperties = ObjectUtils.firstNonNull(
-                    BismuthColormaticResolution.COLOR_PROPERTIES,
-                    BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES);
+                    BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                    BismuthColormaticResolution.COLOR_PROPERTIES);
 
             color = colorProperties.getProperties().getDimensionSky(key);
 
@@ -75,14 +75,14 @@ public final class DefaultBismuthResolverProviders {
        if(BismuthColormaticResolution.hasCustomFogColors()
        && key.equals(Bismuth.OVERWORLD)) {
            var fogColors = ObjectUtils.firstNonNull(
-             BismuthColormaticResolution.FOG_COLORS,
-             BismuthColormaticResolution.COLORMATIC_FOG_COLORS
+                   BismuthColormaticResolution.COLORMATIC_FOG_COLORS,
+             BismuthColormaticResolution.FOG_COLORS
            );
            color = 0xff000000 | fogColors.getColorMapping().getColorAtCoordinatesForBiome(manager, biome, coordinates);
        } else {
            var colorProperties = ObjectUtils.firstNonNull(
-                   BismuthColormaticResolution.COLOR_PROPERTIES,
-                   BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES);
+                   BismuthColormaticResolution.COLORMATIC_COLOR_PROPERTIES,
+                   BismuthColormaticResolution.COLOR_PROPERTIES);
 
            color = colorProperties.getProperties().getDimensionFog(key);
 

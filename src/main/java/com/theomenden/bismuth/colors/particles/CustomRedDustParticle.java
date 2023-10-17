@@ -5,6 +5,7 @@ import com.theomenden.bismuth.utils.ColorConverter;
 import com.theomenden.bismuth.utils.MathUtils;
 import net.minecraft.core.particles.DustParticleOptions;
 import org.apache.commons.lang3.ObjectUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 public class CustomRedDustParticle extends DustParticleOptions {
@@ -14,7 +15,7 @@ public class CustomRedDustParticle extends DustParticleOptions {
     }
 
     @Override
-    public Vector3f getColor() {
+    public @NotNull Vector3f getColor() {
         if(BismuthColormaticResolution.hasCustomRedstoneColors()) {
             return ColorConverter.createColorVector(getFullPoweredColor());
         }

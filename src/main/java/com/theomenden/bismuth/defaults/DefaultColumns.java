@@ -1,46 +1,41 @@
 package com.theomenden.bismuth.defaults;
 
+import com.google.common.collect.Maps;
+import com.theomenden.bismuth.client.Bismuth;
 import com.theomenden.bismuth.models.records.ColumnBounds;
 import com.theomenden.bismuth.utils.SimpleBiomeRegistryUtils;
-import net.fabricmc.fabric.impl.biome.modification.BuiltInRegistryKeys;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.registries.VanillaRegistries;
-import net.minecraft.data.worldgen.biome.BiomeData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import org.apache.commons.lang3.Range;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.intellij.lang.annotations.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class DefaultColumns {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bismuth.class);
     private static final Map<ResourceLocation, ResourceLocation> dynamicColumns = new HashMap<>();
-
-    private static final Map<ResourceLocation, ColumnBounds> currentColumns = createCurrentColumnBoundaries();
-
     private static final Map<ResourceLocation, ColumnBounds> legacyColumns = createLegacyColumnBoundaries();
-
     private static final Map<ResourceLocation, ColumnBounds> stableColumns = createStableColumnBoundaries();
-    private static final int TOTAL_VANILLA_BIOMES = SimpleBiomeRegistryUtils
-            .getBIOME_KEYS().size();
     private static final int TOTAL_LEGACY_BIOMES = 176;
+    public static Map<ResourceLocation, ColumnBounds> currentColumns;
 
     private DefaultColumns(){}
 
     public static void reloadDefaultColumnBoundaries(RegistryAccess manager) {
         dynamicColumns.clear();
         if(manager != null) {
-            var biomeRegistry = manager.registry(Registries.BIOME).get();
+            var biomeRegistry = manager.registryOrThrow(Registries.BIOME);
 
             biomeRegistry
                     .entrySet()
@@ -59,7 +54,7 @@ public class DefaultColumns {
 
             if(currentBoundaries == null) {
                 var msg = "Custom biome has no approximate in vanilla: " + biomeResourceLocation.location();
-                LOGGER.warn(msg);
+                LOGGER.error(msg);
                 throw new IllegalStateException(msg);
             }
         }
@@ -67,29 +62,39 @@ public class DefaultColumns {
     }
 
     public static ColumnBounds getOptifineBoundaries(ResourceKey<Biome> biomeResourceKey, ResourceKey<Registry<Biome>> biomeRegistry) {
-        var currentBoundaries = currentColumns.get(biomeResourceKey.location());
+        int rawID = SimpleBiomeRegistryUtils.getBiomes().getOrDefault(biomeResourceKey.location(), -1);
 
-        if(currentBoundaries == null) {
-            var biomeReference = VanillaRegistries.createLookup()
-                    .asGetterLookup()
-                    .lookupOrThrow(biomeRegistry)
-                    .getOrThrow(biomeResourceKey);
-
-            int rawId = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY)
-                    .registryOrThrow(biomeRegistry)
-                    .getId(biomeReference.value());
-
-            return new ColumnBounds(rawId, 1);
-        }
-        return currentBoundaries;
+        return new ColumnBounds(rawID, 1);
     }
 
+    public static ColumnBounds getOptifineBoundaries(ResourceKey<Biome> biomeResourceKey, Registry<Biome> biomeRegistry) {
+        int rawID = SimpleBiomeRegistryUtils.getBiomes().getOrDefault(biomeResourceKey, -1);
+
+        return new ColumnBounds(rawID, 1);
+    }
+
+    public static ColumnBounds getLegacyBoundaries(ResourceKey<Biome> biomeKey, Registry<Biome> biomeRegistry, boolean isUsingOptifine) {
+        var bounds = legacyColumns.get(biomeKey.location());
+       if(bounds == null) {
+           if(isUsingOptifine) {
+               int rawID = biomeRegistry.getId(biomeRegistry.get(biomeKey));
+               return new ColumnBounds(rawID - SimpleBiomeRegistryUtils.getBiomes().size() + TOTAL_LEGACY_BIOMES,1);
+           } else {
+               bounds = legacyColumns.get(vanillaBiomeApproximation(biomeKey));
+               if(bounds == null) {
+                   var message  = "No approximation for provided biome: " + biomeKey.location();
+                   LOGGER.error(message);
+                   throw new IllegalStateException(message);
+               }
+           }
+       }
+        return bounds;
+    }
 
     public static ColumnBounds getLegacyBoundaries(ResourceKey<Biome> biomeKey, ResourceKey<Registry<Biome>> biomeRegistry, boolean isUsingOptifine) {
         var bounds = legacyColumns.get(biomeKey.location());
 
-        if(bounds == null
-                && isUsingOptifine) {
+        if(bounds == null && isUsingOptifine) {
             var biomeReference = VanillaRegistries.createLookup()
                                                   .asGetterLookup()
                                                   .lookupOrThrow(biomeRegistry)
@@ -99,7 +104,7 @@ public class DefaultColumns {
                                       .registryOrThrow(biomeRegistry)
                                       .getId(biomeReference.value());
 
-            return new ColumnBounds(rawId - TOTAL_VANILLA_BIOMES + TOTAL_LEGACY_BIOMES, 1);
+            return new ColumnBounds(rawId - SimpleBiomeRegistryUtils.getBiomes().size() + TOTAL_LEGACY_BIOMES, 1);
         }
 
         bounds = legacyColumns.get(vanillaBiomeApproximation(biomeKey));
@@ -120,7 +125,7 @@ public class DefaultColumns {
             bounds = stableColumns.get(vanillaBiomeApproximation(biomeResourceKey));
 
             if(bounds == null) {
-                var msg = "Custom biomeSource has no vanilla approximate biome Source: " + biomeResourceKey;
+                var msg = "Custom biome has no vanilla approximate biome: " + biomeResourceKey;
                 LOGGER.error(msg);
                 throw new IllegalStateException(msg);
             }
@@ -136,7 +141,8 @@ public class DefaultColumns {
             return id;
         }
 
-        var msg = "No column boundaries exist for the dynamic biomeSource: " + biomeResourceLocation;
+        var msg = "No column boundaries exist for this Biome: " + biomeResourceLocation;
+        LOGGER.error(msg);
         throw new IllegalArgumentException(msg);
     }
 
@@ -146,9 +152,9 @@ public class DefaultColumns {
             throw new IllegalStateException("Biome is not registered: " + biomeResourceKey.location());
         }
 
-        double temperature = customBiome.climateSettings.temperature();
-        double humidity = Range.between(0.0, 1.0).fit((double)customBiome.climateSettings.downfall());
-        double minimumDistanceSquare = Double.POSITIVE_INFINITY;
+        float temperature = customBiome.climateSettings.temperature();
+        float humidity = Range.between(0.0f, 1.0f).fit((customBiome.climateSettings.downfall()));
+        float minimumDistanceSquare = Float.POSITIVE_INFINITY;
 
         ResourceLocation minimumBiomeLocation = null;
 
@@ -160,9 +166,10 @@ public class DefaultColumns {
                 continue;
             }
 
-            var temperatureDelta = temperature - vanillaBiome.climateSettings.temperature();
-            var humidityDelta =  humidity - Range.between(0.0, 1.0).fit((double)vanillaBiome.climateSettings.downfall());
-            var distance = Math.pow(temperatureDelta, 2) + Math.pow(humidityDelta, 2);
+            float downfall = vanillaBiome.climateSettings.downfall();
+            float temperatureDelta = temperature - vanillaBiome.climateSettings.temperature();
+            float humidityDelta =  humidity - Range.between(0.0f, 1.0f).fit(downfall);
+            float distance = (temperatureDelta * temperatureDelta) + (humidityDelta * humidityDelta);
 
             if(distance < minimumDistanceSquare) {
                 minimumDistanceSquare = distance;
@@ -172,14 +179,17 @@ public class DefaultColumns {
         return minimumBiomeLocation;
     }
 
-    private static Map<ResourceLocation, ColumnBounds> createCurrentColumnBoundaries() {
-        Map<ResourceLocation, ColumnBounds> result = new HashMap<>();
-
-        for(var biomeRegistryKey : SimpleBiomeRegistryUtils.getBIOME_KEYS()) {
-            result.put(biomeRegistryKey.location(), new ColumnBounds(SimpleBiomeRegistryUtils.getBiomeRawId(biomeRegistryKey), 1) );
+    public static Map<ResourceLocation, ColumnBounds> createCurrentColumnBoundaries(Level world) {
+        if (world == null) return Collections.emptyMap();
+        // based on the raw IDs in current Minecraft code
+        var map = new HashMap<ResourceLocation, ColumnBounds>();
+        Registry<Biome> biomeRegistry = world.registryAccess().registry(Registries.BIOME).get();
+        for(var biome : biomeRegistry) {
+            var id = biomeRegistry.getKey(biome);
+            var rawId = biomeRegistry.getId(biome);
+            map.put(id, new ColumnBounds(rawId, 1));
         }
-
-        return result;
+        return map;
     }
 
     private static Map<ResourceLocation, ColumnBounds> createLegacyColumnBoundaries() {

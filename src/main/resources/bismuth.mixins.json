@@ -5,22 +5,20 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "biome.BiomeColorsMixin",
+    "client.ChatStyleMixin",
+    "client.ClickableWidgetMixin",
     "client.ClientLevelMixin",
     "client.GuiMixin",
     "client.MinecraftClientMixin",
-    "client.OptionsMixin",
     "client.ResourceLocationMixin",
-    "client.ChatStyleMixin",
-    "client.VideoSettingsScreenMixin",
-    "client.ClickableWidgetMixin",
-    "coloring.dye.DyeColorMixin",
-    "coloring.dye.SheepEntityMixin",
     "coloring.TextureManagerMixin",
     "coloring.blocks.BlockColorsAccessor",
     "coloring.blocks.BlockColorsMixin",
     "coloring.blocks.LeverBlockMixin",
     "coloring.blocks.MaterialColorMixin",
     "coloring.dye.BannerBlockEntityRendererMixin",
+    "coloring.dye.DyeColorMixin",
+    "coloring.dye.SheepEntityMixin",
     "coloring.dye.WolfCollarFeatureRendererMixin",
     "coloring.items.ItemColorsMixin",
     "coloring.items.ItemMixin",
@@ -46,6 +44,7 @@
     "renderers.LightTextureMixin"
   ],
   "mixins": [
+    "coloring.blocks.RedstoneWireMixin"
   ],
   "injectors": {
     "defaultRequire": 1

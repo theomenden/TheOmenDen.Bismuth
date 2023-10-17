@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ClientLevel.class)
 public abstract class SodiumClientLevelMixin extends Level implements BiomeSeedProvider {
-    private SodiumClientLevelMixin() {
+    protected SodiumClientLevelMixin() {
         super(null, null, null, null, null, false, false, 0L, 0);
     }
 

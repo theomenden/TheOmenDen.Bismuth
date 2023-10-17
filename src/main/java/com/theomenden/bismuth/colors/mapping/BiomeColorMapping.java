@@ -4,36 +4,33 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.theomenden.bismuth.client.Bismuth;
 import com.theomenden.bismuth.colors.BismuthExtendedColorResolver;
 import com.theomenden.bismuth.colors.interfaces.BismuthResolver;
-import com.theomenden.bismuth.models.ColorMappingProperties;
+import com.theomenden.bismuth.colors.properties.ColorMappingProperties;
 import com.theomenden.bismuth.models.records.BismuthColor;
 import com.theomenden.bismuth.models.records.ColumnBounds;
 import com.theomenden.bismuth.models.records.Coordinates;
 import com.theomenden.bismuth.utils.ColorConverter;
-import com.theomenden.bismuth.utils.SimpleBiomeRegistryUtils;
 import lombok.Getter;
-import net.fabricmc.fabric.impl.biome.modification.BuiltInRegistryKeys;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import org.apache.commons.lang3.Range;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
 
 public class BiomeColorMapping implements BismuthResolver {
-    private static final Logger LOGGER = LogManager.getLogger(Bismuth.MODID);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bismuth.class);
     @Getter
     private final ColorMappingProperties properties;
     private final NativeImage imageColorMapping;
     @Getter
-    private transient final int defaultColor;
+    private transient int defaultColor;
     private transient final BismuthExtendedColorResolver resolver;
 
     public BiomeColorMapping(ColorMappingProperties properties, NativeImage colorMapping) {
@@ -60,13 +57,13 @@ public class BiomeColorMapping implements BismuthResolver {
                         .between(0.0f, 1.0f)
                         .fit(temp);
                 float rain = Range
-                        .between(0.0f, 1.0f)
+                        .between(0.5f, 1.0f)
                         .fit(biome.climateSettings.downfall());
-                return getColorMap(temp, rain);
+                return getColor(temp, rain);
             }
             case GRID -> {
                 ColumnBounds columnBounds = properties.getColumn(
-                        Bismuth.getBiomeResourceKey(manager, biome), Registries.BIOME);
+                        Bismuth.getBiomeResourceKey(manager, biome), manager.registry(Registries.BIOME).get());
                 @SuppressWarnings({"removal", "deprecation"})
                 double fraction = Biome.BIOME_INFO_NOISE
                         .getValue(coordinates.x() * 0.0225, coordinates.z() * 0.0225, false);
@@ -95,6 +92,11 @@ public class BiomeColorMapping implements BismuthResolver {
         if(worldOrPositionIsNull(world, pos)) {
             return colormap.getDefaultColor();
         }
+
+        if(colormap.defaultColor == -1) {
+            colormap.defaultColor = colormap.computeDefaultColor(world, colormap.properties);
+        }
+
         return colormap.resolver.resolveExtendedColor(world, pos);
     }
 
@@ -102,10 +104,10 @@ public class BiomeColorMapping implements BismuthResolver {
         return world == null || pos == null;
     }
 
-    private int getColorMap(double temperature, double rain) {
+    private int getColor(float temperature, float rain) {
         rain *= temperature;
-        int x = (int)((1.0D - temperature) * 255.0D);
-        int y = (int)((1.0D - rain) * 255.0D);
+        int x = (int)((1.0f - temperature) * 255.0f);
+        int y = (int)((1.0f - rain) * 255.0f);
 
         if(x >= imageColorMapping.getWidth() || y >= imageColorMapping.getHeight()) {
             return 0xffff00ff;
@@ -121,15 +123,41 @@ public class BiomeColorMapping implements BismuthResolver {
             }
             case GRID -> {
                 try {
-                    int x =  properties.getColumn(Biomes.PLAINS, Registries.BIOME)
+                    int x =  properties.getColumn(Biomes.PLAINS, Minecraft.getInstance().level.registryAccess().registryOrThrow(Registries.BIOME))
                                        .Column();
                     int y = Range
                             .between(0, imageColorMapping.getHeight() - 1)
                             .fit(63 - properties.getYOffset());
 
                     return imageColorMapping.getPixelRGBA(x, y);
+                } catch (IllegalArgumentException | NullPointerException e) {
+                    return 0xffffffff;
+                }
+            }
+            case FIXED -> {
+                return 0xffffffff;
+            }
+        }
+        throw new AssertionError();
+    }
+
+    private int computeDefaultColor(BlockAndTintGetter world, ColorMappingProperties properties) {
+        switch (properties.getFormat()) {
+            case VANILLA -> {
+                return imageColorMapping.getPixelRGBA(128, 128);
+            }
+            case GRID -> {
+                try {
+                    int x = properties
+                            .getColumn(Biomes.PLAINS, Minecraft.getInstance().level
+                                    .registryAccess()
+                                    .registryOrThrow(Registries.BIOME))
+                            .Column();
+                    int y = Range
+                            .between(0, imageColorMapping.getHeight() - 1)
+                            .fit(63 - properties.getYOffset());
+                    return imageColorMapping.getPixelRGBA(x, y);
                 } catch (IllegalArgumentException e) {
-                    LOGGER.error("Failed to parse color: " + e);
                     return 0xffffffff;
                 }
             }

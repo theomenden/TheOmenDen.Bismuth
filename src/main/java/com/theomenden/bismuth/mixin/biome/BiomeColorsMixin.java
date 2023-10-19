@@ -13,11 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BiomeColors.class)
 public abstract class BiomeColorsMixin {
-    @Inject(
-            method = "getAverageWaterColor",
-            at =@At("HEAD"),
-            cancellable = true
-    )
+    @Inject(method = "getAverageWaterColor", at =@At("HEAD"), cancellable = true)
     private static void onColoringWater(BlockAndTintGetter level, BlockPos blockPos, CallbackInfoReturnable<Integer> cir) {
         if(BismuthColormaticResolution.hasCustomWaterColors()) {
             var colorMap = ObjectUtils.firstNonNull(

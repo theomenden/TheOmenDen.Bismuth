@@ -7,6 +7,8 @@ import com.theomenden.bismuth.colors.decorators.ModelIdContext;
 import com.theomenden.bismuth.colors.mapping.BiomeColorMappings;
 import com.theomenden.bismuth.mixin.coloring.blocks.BlockColorsAccessor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.commands.CommandBuildContext;
@@ -35,6 +37,45 @@ public abstract class ModelBakeryMixin {
                     FeatureFlags.DEFAULT_FLAGS
             )
     );
+
+    @Inject(
+            method="method_45877",
+            at= @At(value ="INVOKE", target = "Lnet/minecraft/client/resources/model/ModelBakery$ModelBakerImpl;bake(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/resources/model/BakedModel;")
+    )
+    private void setModelIdContext(BiFunction<ResourceLocation, Material, TextureAtlasSprite> biFunction, ResourceLocation resourceLocation, CallbackInfo ci) {
+        boolean finished = false;
+        ModelIdContext.shouldTintCurrentModel = false;
+        if (resourceLocation instanceof ModelResourceLocation modelId) {
+            BlockState blockState = null;
+            if (modelId
+                    .getVariant()
+                    .equals("inventory")) {
+                var blockId = new ResourceLocation(modelId.getNamespace(), modelId.getPath());
+                blockState = BuiltInRegistries.BLOCK
+                        .get(blockId)
+                        .defaultBlockState();
+            } else {
+                var blockStateDesc = modelId.getNamespace() + ":" + modelId.getPath() + "[" + modelId.getVariant() + "]";
+                try {
+                    blockState = BLOCK_STATE_PARSER
+                            .parse(new StringReader(blockStateDesc))
+                            .getState();
+                } catch (CommandSyntaxException e) {
+                    finished = true;
+                }
+            }
+            if (!finished) {
+                if (BiomeColorMappings.isCustomColored(blockState)) {
+                    var colorProviders = ((BlockColorsAccessor) Minecraft
+                            .getInstance()
+                            .getBlockColors()).getBlockColors();
+                    if (!colorProviders.contains(BuiltInRegistries.BLOCK.getId(blockState.getBlock()))) {
+                        ModelIdContext.shouldTintCurrentModel = true;
+                    }
+                }
+            }
+        }
+    }
 
     @Inject(
             method = "loadModel",

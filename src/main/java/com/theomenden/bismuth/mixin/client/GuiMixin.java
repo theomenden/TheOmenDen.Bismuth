@@ -9,10 +9,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 @Mixin(Gui.class)
 public abstract class GuiMixin {
-    @ModifyConstant(
-            method = "renderExperienceBar",
-            constant = @Constant(intValue = 8453920)
-    )
+    @ModifyConstant(method = "renderExperienceBar", constant = @Constant(intValue = 8453920))
     private int getExperienceTextColor(int original) {
         var xpTextProperties = ObjectUtils.firstNonNull(
                 BismuthColormaticResolution.COLOR_PROPERTIES,

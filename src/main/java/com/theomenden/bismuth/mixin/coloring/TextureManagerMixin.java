@@ -15,7 +15,6 @@ import java.util.concurrent.Executor;
 @Mixin(TextureManager.class)
 public abstract class TextureManagerMixin {
 
-    @Dynamic("Post reload method in lambda")
     @Inject(
             method = "method_18167",
             at = @At("HEAD")

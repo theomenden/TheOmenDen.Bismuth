@@ -1,36 +1,34 @@
 package com.theomenden.bismuth.models;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.theomenden.bismuth.client.Bismuth;
 import com.theomenden.bismuth.colors.BismuthExtendedColorResolver;
 import com.theomenden.bismuth.colors.interfaces.BismuthResolver;
 import com.theomenden.bismuth.colors.interfaces.BismuthResolverProvider;
 import com.theomenden.bismuth.colors.mapping.BiomeColorMapping;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
-import org.intellij.lang.annotations.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 public class ColorMappingStorage<T> {
     private final Table<T, ResourceLocation, BiomeColorMapping> colorMappings;
-    private final Map<T, BiomeColorMapping> fallbackColorMappings;
-    private final Map<T, BismuthExtendedColorResolver> resolvers;
-    private final Map<T, BismuthResolver> defaultResolvers;
+    private final Object2ObjectLinkedOpenHashMap<T, BiomeColorMapping> fallbackColorMappings;
+    private final Object2ObjectOpenHashMap<T, BismuthExtendedColorResolver> resolvers;
+    private final Object2ObjectLinkedOpenHashMap<T, BismuthResolver>  defaultResolvers;
     private final BismuthResolverProvider<T> defaultResolverProvider;
 
     public ColorMappingStorage(BismuthResolverProvider<T> defaultResolverProvider) {
         this.colorMappings = HashBasedTable.create();
-        this.fallbackColorMappings = new HashMap<>();
-        this.resolvers = new HashMap<>();
-        this.defaultResolvers = new HashMap<>();
+        this.fallbackColorMappings = new Object2ObjectLinkedOpenHashMap<>();
+        this.resolvers = new Object2ObjectOpenHashMap<>();
+        this.defaultResolvers = new Object2ObjectLinkedOpenHashMap<>();
         this.defaultResolverProvider = defaultResolverProvider;
     }
 

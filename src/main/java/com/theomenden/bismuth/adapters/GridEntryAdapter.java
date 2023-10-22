@@ -1,16 +1,15 @@
 package com.theomenden.bismuth.adapters;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.theomenden.bismuth.models.GridEntry;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GridEntryAdapter extends TypeAdapter<GridEntry> {
     private final ResourceLocationAdapter identifierAdapter = new ResourceLocationAdapter();
@@ -28,8 +27,8 @@ public class GridEntryAdapter extends TypeAdapter<GridEntry> {
             }
             case STRING -> {
                 var biomeIdentifier = this.identifierAdapter.read(jsonReader);
-                var gridEntry= new GridEntry();
-                gridEntry.biomes = ImmutableList.of(biomeIdentifier);
+                var gridEntry = new GridEntry();
+                gridEntry.biomes = ObjectImmutableList.of(biomeIdentifier);
                 return gridEntry;
             }
             default -> {
@@ -53,13 +52,13 @@ public class GridEntryAdapter extends TypeAdapter<GridEntry> {
         return gridEntry;
     }
 
-    private List<ResourceLocation> readBiomes(JsonReader in) throws IOException {
-        List<ResourceLocation> biomes = new ArrayList<>();
+    private ObjectImmutableList<ResourceLocation> readBiomes(JsonReader in) throws IOException {
+        ObjectArrayList<ResourceLocation> biomes = ObjectArrayList.of();
         in.beginArray();
         while (in.hasNext()) {
             biomes.add(this.identifierAdapter.read(in));
         }
         in.endArray();
-        return biomes;
+        return ObjectImmutableList.of(biomes.elements());
     }
 }

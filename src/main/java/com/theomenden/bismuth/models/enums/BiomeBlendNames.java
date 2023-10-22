@@ -2,6 +2,7 @@ package com.theomenden.bismuth.models.enums;
 
 import lombok.Getter;
 import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
 public enum BiomeBlendNames implements StringRepresentable {
     BURLY("text.autoconfig.bismuth.option.blendingRadius.17", 8),
@@ -18,7 +19,7 @@ public enum BiomeBlendNames implements StringRepresentable {
     private BiomeBlendNames(String name, int value){ this.name = name; this.value = value;}
 
     @Override
-    public String getSerializedName() {
+    public @NotNull String getSerializedName() {
         return this.name;
     }
 }

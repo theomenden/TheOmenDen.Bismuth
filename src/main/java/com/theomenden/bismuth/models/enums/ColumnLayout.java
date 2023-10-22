@@ -1,6 +1,7 @@
 package com.theomenden.bismuth.models.enums;
 
 import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
 public enum ColumnLayout implements StringRepresentable {
     DEFAULT("default"),
@@ -15,7 +16,7 @@ public enum ColumnLayout implements StringRepresentable {
     }
 
     @Override
-    public String getSerializedName() {
+    public @NotNull String getSerializedName() {
         return name;
     }
 }

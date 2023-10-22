@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.jetbrains.annotations.NotNull;
 
 public class GlobalLightMappingResource  implements SimpleSynchronousResourceReloadListener {
     private final ResourceLocation identifier;
@@ -21,7 +22,7 @@ public class GlobalLightMappingResource  implements SimpleSynchronousResourceRel
     }
 
     @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {
+    public void onResourceManagerReload(@NotNull ResourceManager resourceManager) {
         properties = LightMappingProperties.loadPropertiesForIdentifier(resourceManager, this.identifier);
     }
 }

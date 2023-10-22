@@ -1,6 +1,7 @@
 package com.theomenden.bismuth.utils;
 
 import com.theomenden.bismuth.client.Bismuth;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +13,7 @@ import java.util.Set;
 public final class BiomeTracingUtils {
     private static final Logger log = LogManager.getLogger(Bismuth.MODID);
     private static final Set<ResourceLocation> REMOVED_BIOMES = createRemovedBiomeSet();
-    private static final Map<ResourceLocation, ResourceLocation> RENAMED_BIOMES = createRenamedBiomeMap();
+    private static final Object2ObjectLinkedOpenHashMap<ResourceLocation, ResourceLocation> RENAMED_BIOMES = createRenamedBiomeMap();
 
     @Nullable
     public static ResourceLocation updateBiomeName(ResourceLocation biomeId, ResourceLocation context) {
@@ -31,8 +32,8 @@ public final class BiomeTracingUtils {
         return biomeId;
     }
 
-    private static Map<ResourceLocation, ResourceLocation> createRenamedBiomeMap() {
-        return Map.ofEntries(
+    private static Object2ObjectLinkedOpenHashMap<ResourceLocation, ResourceLocation> createRenamedBiomeMap() {
+        var renamedBiomes = Map.ofEntries(
                 Map.entry(new ResourceLocation("mountains"), new ResourceLocation("windswept_hills")),
                 Map.entry(new ResourceLocation("snowy_tundra"), new ResourceLocation("snowy_plains")),
                 Map.entry(new ResourceLocation("jungle_edge"), new ResourceLocation("sparse_jungle")),
@@ -45,6 +46,7 @@ public final class BiomeTracingUtils {
                 Map.entry(new ResourceLocation("giant_spruce_taiga"), new ResourceLocation("old_growth_spruce_taiga")),
                 Map.entry(new ResourceLocation("shattered_savanna"), new ResourceLocation("windswept_savanna"))
         );
+        return new Object2ObjectLinkedOpenHashMap<>(renamedBiomes);
     }
 
     private static Set<ResourceLocation> createRemovedBiomeSet() {

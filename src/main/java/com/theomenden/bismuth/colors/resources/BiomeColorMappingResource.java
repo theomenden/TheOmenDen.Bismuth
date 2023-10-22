@@ -7,14 +7,13 @@ import com.theomenden.bismuth.utils.GsonUtils;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class BiomeColorMappingResource implements SimpleSynchronousResourceReloadListener {
     private final ResourceLocation identifier;
     private final ResourceLocation optifineId;
-
     private final ResourceLocation colormaticId;
-
     private BiomeColorMapping mapping;
 
     public BiomeColorMappingResource(ResourceLocation identifier) {
@@ -59,7 +58,7 @@ public class BiomeColorMappingResource implements SimpleSynchronousResourceReloa
 
 
     @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {
+    public void onResourceManagerReload(@NotNull ResourceManager resourceManager) {
         PropertyImage propertyImage;
 
         try {

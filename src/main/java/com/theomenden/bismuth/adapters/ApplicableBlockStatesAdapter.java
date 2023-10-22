@@ -7,21 +7,21 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import com.theomenden.bismuth.client.Bismuth;
 import com.theomenden.bismuth.models.ApplicableBlockStates;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.predicate.BlockStatePredicate;
 import net.minecraft.world.level.block.state.properties.Property;
-import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockStates> {
 
@@ -90,7 +90,7 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
             }
 
             String[] propertyValues = parts[i].substring(splitIndex + 1).split(",");
-            List<Comparable<?>> container = new ArrayList<>();
+            ObjectArrayList<Comparable<?>> container = new ObjectArrayList<>();
 
             for(String val : propertyValues) {
                 putPropertyValue(container, propertyState, val);
@@ -99,7 +99,7 @@ public class ApplicableBlockStatesAdapter extends TypeAdapter<ApplicableBlockSta
             predicate = predicate.where(propertyState, container::contains);
         }
 
-        applicableBlockStates.states = new ArrayList<>();
+        applicableBlockStates.states = new ObjectArrayList<>();
         boolean isExcluded = false;
 
         for(BlockState state: block.getStateDefinition()

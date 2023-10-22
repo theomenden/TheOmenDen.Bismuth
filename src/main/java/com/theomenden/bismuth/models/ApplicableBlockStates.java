@@ -1,16 +1,14 @@
 package com.theomenden.bismuth.models;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.apache.commons.compress.utils.Lists;
-
-import java.util.Collection;
 
 public final class ApplicableBlockStates {
     public Block block = Blocks.AIR;
-    public Collection<BlockState> states = Lists.newArrayList();
+    public ObjectArrayList<BlockState> states = new ObjectArrayList<>();
     public ResourceLocation specialKey = null;
-    public Collection<ResourceLocation> specialLocations = Lists.newArrayList();
+    public ObjectArrayList<ResourceLocation> specialLocations = new ObjectArrayList<>();
 }

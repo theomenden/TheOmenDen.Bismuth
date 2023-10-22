@@ -133,7 +133,6 @@ public final class GsonUtils {
         return PROPERTY_GSON.toJson(propertyMap);
     }
 
-
     private static Object mergeCompoundKeys(Object existingValue, Object newValue) {
         if(existingValue  instanceof Map<?,?>) {
             @SuppressWarnings("unchecked")

@@ -1,7 +1,5 @@
 package com.theomenden.bismuth.utils;
 
-import java.util.stream.IntStream;
-
 public final class LCGUtils {
     private LCGUtils() {}
     private static final int lower = 214_013;

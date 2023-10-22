@@ -1,6 +1,7 @@
 package com.theomenden.bismuth.models.enums;
 
 import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
 public enum ColoredParticle implements StringRepresentable {
     WATER("water"),
@@ -14,7 +15,7 @@ public enum ColoredParticle implements StringRepresentable {
     }
 
     @Override
-    public String getSerializedName() {
+    public @NotNull String getSerializedName() {
         return this.name;
     }
 }

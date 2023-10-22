@@ -1,6 +1,7 @@
 package com.theomenden.bismuth.models.enums;
 
 import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
 public enum InternalEventType implements StringRepresentable {
     COLOR("Color Generation"),
@@ -13,7 +14,7 @@ public enum InternalEventType implements StringRepresentable {
     private final String name;
 
     @Override
-    public String getSerializedName() {
+    public @NotNull String getSerializedName() {
         return name;
     }
 }

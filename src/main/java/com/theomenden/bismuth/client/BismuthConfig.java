@@ -1,6 +1,5 @@
 package com.theomenden.bismuth.client;
 
-import com.theomenden.bismuth.models.enums.BiomeBlendNames;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;

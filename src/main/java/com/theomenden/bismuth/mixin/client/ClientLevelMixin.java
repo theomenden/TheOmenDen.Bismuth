@@ -15,7 +15,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.CubicSampler;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -45,12 +44,12 @@ public abstract class ClientLevelMixin extends Level {
     }
 
     @Inject(method = "clearTintCaches", at = @At("RETURN"))
-    public void onClearColorCaches(CallbackInfo ci) {
+    public void removeBismuthColorResolver(CallbackInfo ci) {
         this.tintCaches.entrySet().removeIf(entry -> entry.getKey() instanceof BismuthExtendedColorResolver);
     }
 
     @Inject( method = "getBlockTint", at = @At("HEAD"))
-    private void onBlockTinting(BlockPos blockPos, ColorResolver colorResolver, CallbackInfoReturnable<Integer> cir) {
+    private void fixBlockTintCache(BlockPos blockPos, ColorResolver colorResolver, CallbackInfoReturnable<Integer> cir) {
         if(this.tintCaches.get(colorResolver) == null) {
             this.tintCaches.put(colorResolver, new BlockTintCache(pos1 -> this.calculateBlockTint(pos1, colorResolver)));
         }

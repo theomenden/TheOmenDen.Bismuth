@@ -39,11 +39,10 @@
   },
   "accessWidener": "bismuth.accesswidener",
   "depends": {
-    "fabricloader": ">=${loader_version}",
     "fabric": "*",
     "minecraft": "${minecraft_version}",
-    "sodium": ">=0.4.10",
-    "indium":">=1.0.19",
+    "sodium": "<=0.4.10",
+    "indium":"<=1.0.21",
     "cloth-config": ">=10.1.105",
     "java": ">=17"
   },

@@ -1,13 +1,10 @@
 package com.theomenden.bismuth.models;
 
+import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 public class GridEntry {
-    public List<ResourceLocation> biomes = Collections.emptyList();
+    public ObjectImmutableList<ResourceLocation> biomes = ObjectImmutableList.of();
     public int column = -1;
     public int width = 1;
 }

@@ -7,7 +7,6 @@ import com.theomenden.bismuth.utils.BismuthColormaticResolution;
 import com.theomenden.bismuth.utils.MathUtils;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ExperienceOrbRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ExperienceOrb;
